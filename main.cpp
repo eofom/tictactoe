@@ -44,8 +44,106 @@ struct Board {
   }
 
   //------------------------------------------------------------------------------
-  void setCell(size_t row, size_t column, Cell::State state) {
+  Cell::State getCellState(size_t row, size_t column) {
+    return cells[ROWLENGTH * row + column].state;
+  }
+
+  //------------------------------------------------------------------------------
+  // FIXME Check dimensions?
+  void setCellState(size_t row, size_t column, Cell::State state) {
     cells[ROWLENGTH * row + column].state = state;
+  }
+
+  //------------------------------------------------------------------------------
+  bool isRowFilled(size_t row, Cell::State player) {
+    // FIXME
+    size_t start = ROWLENGTH * row;
+    auto owned_by_player = [player](const Cell & cell) {
+      return cell.state == player;
+    };
+
+    return std::all_of(cells.begin() + start,
+                       cells.begin() + start + ROWLENGTH,
+                       owned_by_player);
+  }
+
+  //------------------------------------------------------------------------------
+  bool isColumnFilled(size_t column, Cell::State player) {
+    // FIXME
+    bool ans = true;
+    for (size_t row = 0; row < ROWLENGTH; ++row) {
+      ans &= getCellState(row, column) == player;
+    }
+
+    return ans;
+  }
+
+  //------------------------------------------------------------------------------
+  bool isTopLeftDiagonalFilled(Cell::State player) {
+    // FIXME
+    return getCellState(0,0) == player
+        && getCellState(1,1) == player
+        && getCellState(2,2) == player;
+  }
+
+  //------------------------------------------------------------------------------
+  bool isBottomLeftDiagonalFilled(Cell::State player) {
+    // FIXME
+    return getCellState(0,2) == player
+        && getCellState(1,1) == player
+        && getCellState(2,0) == player;
+  }
+
+  //------------------------------------------------------------------------------
+  bool isWinner(Cell::State player) {
+    return isRowFilled(0, player)
+        || isRowFilled(1, player)
+        || isRowFilled(2, player)
+        || isColumnFilled(0, player)
+        || isColumnFilled(1, player)
+        || isColumnFilled(2, player)
+        || isTopLeftDiagonalFilled(player)
+        || isBottomLeftDiagonalFilled(player);
+  }
+
+  //------------------------------------------------------------------------------
+  bool isWinnerX() {
+    return isWinner(Cell::State::X);
+  }
+
+  //------------------------------------------------------------------------------
+  bool isWinnerO() {
+    return isWinner(Cell::State::O);
+  }
+
+  //------------------------------------------------------------------------------
+  std::vector<Cell> possibleMoves() {
+    // FIXME
+    return {};
+  }
+
+  //------------------------------------------------------------------------------
+  enum class GameState {
+    Pending = 0,
+    winX,
+    winO,
+    Draw
+  };
+
+  //------------------------------------------------------------------------------
+  GameState checkGameState() {
+    GameState ans = GameState::Pending;
+    if (isWinnerX()) {
+      ans = GameState::winX;
+    } else if (isWinnerO()) {
+      ans = GameState::winO;
+    } else if (possibleMoves().empty()) {
+      ans = GameState::Draw;
+    } else {
+      ans = GameState::Pending;
+    }
+
+    return ans;
   }
 
   //------------------------------------------------------------------------------
@@ -53,7 +151,7 @@ struct Board {
     Board board;
     Cell::State player = Cell::State::X;
     for (const Move & move : moves) {
-      board.setCell(move.row, move.column, player);
+      board.setCellState(move.row, move.column, player);
       player = board.otherPlayer(player);
     }
 
@@ -129,95 +227,6 @@ std::istream & ReadAllMoves(std::istream & is, std::vector<Move> & moves) {
 }
 
 //------------------------------------------------------------------------------
-std::vector<Move> getOddMoves(const std::vector<Move> & moves) {
-  std::vector<Move> odd_moves;
-  for (size_t i = 0; i < moves.size(); ++i) {
-    if (i % 2 == 0) {
-      odd_moves.push_back(moves.at(i));
-    }
-  }
-
-  return odd_moves;
-}
-
-//------------------------------------------------------------------------------
-std::vector<Move> getEvenMoves(const std::vector<Move> & moves) {
-  std::vector<Move> even_moves;
-  for (size_t i = 0; i < moves.size(); ++i) {
-    if (i % 2) {
-      even_moves.push_back(moves.at(i));
-    }
-  }
-
-  return even_moves;
-}
-
-//------------------------------------------------------------------------------
-bool isRowFilled(size_t rownum, const std::vector<Move> & moves) {
-  std::vector<Move> row_items;
-  for (const Move & cell : moves) {
-    if (cell.row == rownum) {
-      row_items.push_back(cell);
-    }
-  }
-
-  return row_items.size() == ROWLENGTH;
-}
-
-//------------------------------------------------------------------------------
-bool isColumnFilled(size_t colnum, const std::vector<Move> & moves) {
-  std::vector<Move> column_items;
-  for (const Move & cell : moves) {
-    if (cell.row == colnum) {
-      column_items.push_back(cell);
-    }
-  }
-
-  return column_items.size() == COLUMNLENGTH;
-}
-
-//------------------------------------------------------------------------------
-bool isTopLeftDiagonalFilled(const std::vector<Move> & moves) {
-  return std::find(moves.begin(), moves.end(), Move(0,0)) != moves.end()
-      && std::find(moves.begin(), moves.end(), Move(1,1)) != moves.end()
-      && std::find(moves.begin(), moves.end(), Move(2,2)) != moves.end();
-}
-
-//------------------------------------------------------------------------------
-bool isBottomLeftDiagonalFilled(const std::vector<Move> & moves) {
-  return std::find(moves.begin(), moves.end(), Move(2,0)) != moves.end()
-      && std::find(moves.begin(), moves.end(), Move(1,1)) != moves.end()
-      && std::find(moves.begin(), moves.end(), Move(0,2)) != moves.end();
-}
-
-//------------------------------------------------------------------------------
-bool allBoardFilled(const std::vector<Move> & moves) {
-  return moves.size() == ROWLENGTH * COLUMNLENGTH;
-}
-
-//------------------------------------------------------------------------------
-bool isWinner(const std::vector<Move> & single_player_moves) {
-  return isRowFilled(0, single_player_moves)
-      || isRowFilled(1, single_player_moves)
-      || isRowFilled(2, single_player_moves)
-      || isColumnFilled(0, single_player_moves)
-      || isColumnFilled(1, single_player_moves)
-      || isColumnFilled(2, single_player_moves)
-      || isTopLeftDiagonalFilled(single_player_moves)
-      || isBottomLeftDiagonalFilled(single_player_moves);
-}
-
-//------------------------------------------------------------------------------
-bool isWinnerA(const std::vector<Move> & all_moves) {
-  return isWinner(getOddMoves(all_moves));
-}
-
-//------------------------------------------------------------------------------
-bool isWinnerB(const std::vector<Move> & all_moves) {
-  return isWinner(getEvenMoves(all_moves));
-}
-
-//------------------------------------------------------------------------------
 int main() {
   std::vector<Move> moves;
   ReadAllMoves(std::cin, moves);
@@ -226,12 +235,11 @@ int main() {
   Board board = Board::Create(moves);
   std::cout << board << std::endl;
 
-
-  if (isWinnerA(moves)) {
+  if (board.isWinnerX()) {
     std::cout << "A" << std::endl;
-  } else if (isWinnerB(moves)) {
+  } else if (board.isWinnerO()) {
     std::cout << "B" << std::endl;
-  } else if (allBoardFilled(moves)) {
+  } else if (board.possibleMoves().empty()) {
     std::cout << "Draw" << std::endl;
   } else {
     std::cout << "Pending" << std::endl;
