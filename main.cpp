@@ -2,9 +2,12 @@
 #include <iostream>
 #include <vector>
 
+using namespace std;
+
 static const size_t ROWLENGTH = 3;
 static const size_t COLUMNLENGTH = 3;
 
+//------------------------------------------------------------------------------
 struct Move {
   Move(size_t row, size_t column)
     : row(row),
@@ -14,6 +17,83 @@ struct Move {
   size_t row = 0;
   size_t column = 0;
 };
+
+//------------------------------------------------------------------------------
+struct Board {
+  struct Cell {
+    enum class State {
+      Open = 0,
+      X,
+      O
+    } state = State::Open;
+  };
+
+  //------------------------------------------------------------------------------
+  Cell::State otherPlayer(Cell::State player) {
+    Cell::State other = Cell::State::Open;
+    switch (player) {
+    case Cell::State::X:
+      other = Cell::State::O;
+      break;
+    case Cell::State::O:
+      other = Cell::State::X;
+      break;
+    }
+
+    return other;
+  }
+
+  //------------------------------------------------------------------------------
+  void setCell(size_t row, size_t column, Cell::State state) {
+    cells[ROWLENGTH * row + column].state = state;
+  }
+
+  //------------------------------------------------------------------------------
+  static Board Create(const std::vector<Move> & moves) {
+    Board board;
+    Cell::State player = Cell::State::X;
+    for (const Move & move : moves) {
+      board.setCell(move.row, move.column, player);
+      player = board.otherPlayer(player);
+    }
+
+    return board;
+  }
+
+  //------------------------------------------------------------------------------
+
+  std::vector<Cell> cells = std::vector<Cell>(9);
+};
+
+//------------------------------------------------------------------------------
+std::ostream & operator<<(std::ostream & os, const Board::Cell & cell) {
+  char repr = ' ';
+  switch (cell.state) {
+  case Board::Cell::State::O:
+    repr = 'O';
+    break;
+  case Board::Cell::State::X:
+    repr = 'X';
+    break;
+  case Board::Cell::State::Open:
+    repr = ' ';
+    break;
+  }
+
+  return os << repr;
+}
+
+//------------------------------------------------------------------------------
+std::ostream & operator<<(std::ostream & os, const Board & board) {
+    os << board.cells.at(0) << " | "s << board.cells.at(1) << " | "s << board.cells.at(2)
+       << std::endl << std::string(9, '-') << std::endl
+       << board.cells.at(3) << " | "s << board.cells.at(4) << " | "s << board.cells.at(5)
+       << std::endl << std::string(9, '-') << std::endl
+       << board.cells.at(6) << " | "s << board.cells.at(7) << " | "s << board.cells.at(8)
+       << std::endl << std::string(9, '-') << std::endl;
+
+    return os;
+}
 
 //------------------------------------------------------------------------------
 bool operator ==(const Move & lhs, const Move rhs) {
@@ -142,7 +222,10 @@ int main() {
   std::vector<Move> moves;
   ReadAllMoves(std::cin, moves);
 
-  std::clog << moves.size() << " moves were made" << std::endl;
+//  std::clog << moves.size() << " moves were made" << std::endl;
+  Board board = Board::Create(moves);
+  std::cout << board << std::endl;
+
 
   if (isWinnerA(moves)) {
     std::cout << "A" << std::endl;
