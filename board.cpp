@@ -5,6 +5,15 @@
 
 using namespace std;
 
+Board::Board()
+{
+  for (size_t row = 0; row < COLUMNLENGTH; ++row) {
+    for (size_t column = 0; column < ROWLENGTH; ++column) {
+      cells.push_back(Cell(row, column));
+    }
+  }
+}
+
 Board::Cell::State Board::otherPlayer(Board::Cell::State player) {
   Cell::State other = Cell::State::Open;
   switch (player) {
@@ -84,8 +93,13 @@ bool Board::isWinnerO() {
 }
 
 std::vector<Board::Cell> Board::possibleMoves() {
-  // FIXME
-  return {};
+  std::vector<Board::Cell> moves;
+  std::copy_if(cells.begin(), cells.end(), std::back_inserter(moves),
+               [] (const Cell & cell) {
+                 return Cell::State::Open == cell.state;
+               });
+
+  return moves;
 }
 
 Board::GameState Board::checkGameState() {

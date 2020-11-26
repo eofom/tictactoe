@@ -135,14 +135,16 @@ TEST_F(TestTicTacToe, testXWinsBottomDiag) {
 }
 
 //------------------------------------------------------------------------------
-//TEST_F(TestTicTacToe, test) {
-
-//}
+TEST_F(TestTicTacToe, testDraw) {
+  Board board = Board::Create({{0,0},{1,1},{2,0},{1,0},{1,2},{2,1},{0,1},{0,2},{2,2}});
+  ASSERT_TRUE(board.possibleMoves().empty());
+}
 
 //------------------------------------------------------------------------------
-//TEST_F(TestTicTacToe, test) {
-
-//}
+TEST_F(TestTicTacToe, testPending) {
+  Board board = Board::Create({{0,0},{1,1}});
+  ASSERT_EQ(7u, board.possibleMoves().size());
+}
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------

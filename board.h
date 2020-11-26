@@ -24,8 +24,20 @@ struct Board {
       Open = 0,
       X,
       O
-    } state = State::Open;
+    };
+
+    Cell(size_t row, size_t column, State state = State::Open)
+      : row(row),
+        column(column),
+        state(state)
+    {}
+
+    size_t row = 0;
+    size_t column = 0;
+    State state = State::Open;
   };
+
+  Board();
 
   Cell::State otherPlayer(Cell::State player);
 
@@ -61,7 +73,7 @@ struct Board {
   static Board Create(const std::vector<Move> & moves);
 
 
-  std::vector<Cell> cells = std::vector<Cell>(9);
+  std::vector<Cell> cells;
 };
 
 
