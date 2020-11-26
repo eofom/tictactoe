@@ -28,7 +28,7 @@ Board::Cell::State Board::otherPlayer(Board::Cell::State player) {
   return other;
 }
 
-Board::Cell::State Board::getCellState(size_t row, size_t column) {
+Board::Cell::State Board::getCellState(size_t row, size_t column) const {
   return cells[ROWLENGTH * row + column].state;
 }
 

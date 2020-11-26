@@ -18,7 +18,6 @@ struct Board {
     size_t column = 0;
   };
 
-
   struct Cell {
     enum class State {
       Open = 0,
@@ -39,9 +38,15 @@ struct Board {
 
   Board();
 
-  Cell::State otherPlayer(Cell::State player);
+  size_t rowCount() const {
+    return COLUMNLENGTH;
+  }
 
-  Cell::State getCellState(size_t row, size_t column);
+  size_t columnCount() const {
+    return ROWLENGTH;
+  }
+
+  Cell::State getCellState(size_t row, size_t column) const;
 
   void setCellState(size_t row, size_t column, Cell::State state);
 
@@ -71,6 +76,8 @@ struct Board {
   GameState checkGameState();
 
   static Board Create(const std::vector<Move> & moves);
+
+  static Cell::State otherPlayer(Cell::State player);
 
 
   std::vector<Cell> cells;
