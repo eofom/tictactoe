@@ -292,6 +292,25 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
 }
 
 //------------------------------------------------------------------------------
+TEST_F(TestGameAI, testWinnerMoves) {
+      Game::AI ai;
+      // X | _ \ _
+      // x | x | _
+      // _ | x | _
+      {
+        Board board;
+        board.setCellState(0, 0, Board::Cell::State::X);
+        board.setCellState(1, 0, Board::Cell::State::X);
+        board.setCellState(1, 1, Board::Cell::State::X);
+        board.setCellState(2, 1, Board::Cell::State::X);
+        auto cells = ai.winnerMoves(board, Board::Cell::State::X);
+        ASSERT_EQ(4u, cells.size());
+        ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{2,0}));
+        ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{0,1}));
+        ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{1,2}));
+        ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{2,2}));
+      }
+}
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
