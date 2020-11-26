@@ -4,6 +4,7 @@
 using namespace std;
 
 #include "board.h"
+#include "game.h"
 
 
 //------------------------------------------------------------------------------
@@ -35,20 +36,23 @@ std::istream & ReadAllMoves(std::istream & is, std::vector<Board::Move> & moves)
 
 //------------------------------------------------------------------------------
 int main() {
-  std::vector<Board::Move> moves;
-  ReadAllMoves(std::cin, moves);
+  Game game;
+  game.play();
 
-//  std::clog << moves.size() << " moves were made" << std::endl;
-  Board board = Board::Create(moves);
-  std::cout << board << std::endl;
+//  std::vector<Board::Move> moves;
+//  ReadAllMoves(std::cin, moves);
 
-  if (board.isWinnerX()) {
-    std::cout << "A" << std::endl;
-  } else if (board.isWinnerO()) {
-    std::cout << "B" << std::endl;
-  } else if (board.possibleMoves().empty()) {
-    std::cout << "Draw" << std::endl;
-  } else {
-    std::cout << "Pending" << std::endl;
-  }
+////  std::clog << moves.size() << " moves were made" << std::endl;
+//  Board board = Board::Create(moves);
+//  std::cout << board << std::endl;
+
+//  if (board.isWinnerX()) {
+//    std::cout << "A" << std::endl;
+//  } else if (board.isWinnerO()) {
+//    std::cout << "B" << std::endl;
+//  } else if (board.possibleMoves().empty()) {
+//    std::cout << "Draw" << std::endl;
+//  } else {
+//    std::cout << "Pending" << std::endl;
+//  }
 }

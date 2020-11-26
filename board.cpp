@@ -133,13 +133,13 @@ std::ostream & operator<<(std::ostream & os, const Board::Cell & cell) {
   char repr = ' ';
   switch (cell.state) {
   case Board::Cell::State::O:
-    repr = 'O';
+    os << 'O';
     break;
   case Board::Cell::State::X:
-    repr = 'X';
+    os << 'X';
     break;
   case Board::Cell::State::Open:
-    repr = ' ';
+    os << (cell.row * COLUMNLENGTH + cell.column + 1);
     break;
   }
 
@@ -149,11 +149,11 @@ std::ostream & operator<<(std::ostream & os, const Board::Cell & cell) {
 //------------------------------------------------------------------------------
 std::ostream & operator<<(std::ostream & os, const Board & board) {
     os << board.cells.at(0) << " | "s << board.cells.at(1) << " | "s << board.cells.at(2)
-       << std::endl << std::string(9, '-') << std::endl
+       << std::endl << std::string(13, '-') << std::endl
        << board.cells.at(3) << " | "s << board.cells.at(4) << " | "s << board.cells.at(5)
-       << std::endl << std::string(9, '-') << std::endl
+       << std::endl << std::string(13, '-') << std::endl
        << board.cells.at(6) << " | "s << board.cells.at(7) << " | "s << board.cells.at(8)
-       << std::endl << std::string(9, '-') << std::endl;
+       << std::endl << std::string(13, '-') << std::endl;
 
     return os;
 }
