@@ -25,8 +25,10 @@ public:
     bool columnHasWinnerMove(const Board & board, size_t column, Board::Cell::State player, std::tuple<size_t, size_t> & winner_move);
     bool leftTopDiagonalHasWinnerMove(const Board & board, Board::Cell::State player, std::tuple<size_t, size_t> & winner_move);
     bool leftBottomDiagonalHasWinnerMove(const Board & board, Board::Cell::State player, std::tuple<size_t, size_t> & winner_move);
-  private:
 
+  private:
+    Board boardAfterMove(size_t row, size_t column, Board::Cell::State player,
+                         const Board & board);
   };
 
 private:

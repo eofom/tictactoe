@@ -63,8 +63,9 @@ std::tuple<size_t, size_t> Game::numberToCellCoordinates(size_t number) {
 }
 
 //----------------------------------------------------------------------------------------
-bool Game::AI::rowHasWinnerMove(const Board &board, size_t row, Board::Cell::State player, std::tuple<size_t, size_t> & winner_move)
-{
+bool Game::AI::rowHasWinnerMove(const Board &board, size_t row,
+                                Board::Cell::State player,
+                                std::tuple<size_t, size_t> & winner_move) {
   bool result = false;
   if (row < board.rowCount()) {
     size_t cells_checked_by_player = 0;
@@ -87,8 +88,9 @@ bool Game::AI::rowHasWinnerMove(const Board &board, size_t row, Board::Cell::Sta
 }
 
 //----------------------------------------------------------------------------------------
-bool Game::AI::columnHasWinnerMove(const Board &board, size_t column, Board::Cell::State player, std::tuple<size_t, size_t> &winner_move)
-{
+bool Game::AI::columnHasWinnerMove(const Board &board, size_t column,
+                                   Board::Cell::State player,
+                                   std::tuple<size_t, size_t> &winner_move) {
   bool result = false;
   if (column < board.columnCount()) {
     size_t cells_checked_by_player = 0;
@@ -111,8 +113,9 @@ bool Game::AI::columnHasWinnerMove(const Board &board, size_t column, Board::Cel
 }
 
 //----------------------------------------------------------------------------------------
-bool Game::AI::leftTopDiagonalHasWinnerMove(const Board &board, Board::Cell::State player, std::tuple<size_t, size_t> &winner_move)
-{
+bool Game::AI::leftTopDiagonalHasWinnerMove(const Board &board,
+                                            Board::Cell::State player,
+                                            std::tuple<size_t, size_t> &winner_move) {
   bool result = false;
   size_t cells_checked_by_player = 0;
   for (size_t row = 0; row < board.rowCount(); ++row) {
@@ -134,13 +137,14 @@ bool Game::AI::leftTopDiagonalHasWinnerMove(const Board &board, Board::Cell::Sta
 }
 
 //----------------------------------------------------------------------------------------
-bool Game::AI::leftBottomDiagonalHasWinnerMove(const Board &board, Board::Cell::State player, std::tuple<size_t, size_t> &winner_move)
-{
+bool Game::AI::leftBottomDiagonalHasWinnerMove(const Board &board,
+                                               Board::Cell::State player,
+                                               std::tuple<size_t, size_t> &winner_move) {
   bool result = false;
   size_t cells_checked_by_player = 0;
   for (size_t column = 0; column < board.columnCount(); ++column) {
     size_t row = board.columnCount() - 1 - column;
-//    std::clog << "["s << row << ", "s << column << "]"s << std::endl;
+    std::clog << "leftBottomDiagonalHasWinnerMove ["s << row << ", "s << column << "]"s << std::endl;
     Board::Cell::State state = board.getCellState(row, column);
     if (state == player) {
       ++cells_checked_by_player;
@@ -158,17 +162,26 @@ bool Game::AI::leftBottomDiagonalHasWinnerMove(const Board &board, Board::Cell::
 }
 
 //----------------------------------------------------------------------------------------
+Board Game::AI::boardAfterMove(size_t row, size_t column, Board::Cell::State player,
+                               const Board &board) {
+  Board next_board(board);
+  next_board.setCellState(row, column, player);
+
+  return next_board;
+}
+
+//----------------------------------------------------------------------------------------
 std::vector<std::tuple<size_t, size_t> > Game::AI::winnerMoves(const Board &board,
                                                                Board::Cell::State player) {
   std::vector<std::tuple<size_t, size_t> > winner_moves;
   std::tuple<size_t, size_t> cell;
-  for (size_t row = 0; row < COLUMNLENGTH; ++row) {
+  for (size_t row = 0; row < board.rowCount(); ++row) {
     if (rowHasWinnerMove(board, row, player, cell)) {
       winner_moves.push_back(cell);
     }
   }
 
-  for (size_t column = 0; column < ROWLENGTH; ++column) {
+  for (size_t column = 0; column < board.columnCount(); ++column) {
     if (columnHasWinnerMove(board, column, player, cell)) {
       winner_moves.push_back(cell);
     }
@@ -183,4 +196,33 @@ std::vector<std::tuple<size_t, size_t> > Game::AI::winnerMoves(const Board &boar
   }
 
   return winner_moves;
+}
+
+//----------------------------------------------------------------------------------------
+std::vector<std::tuple<size_t, size_t> > Game::AI::loserMoves(const Board &board,
+                                                              Board::Cell::State player) {
+  return winnerMoves(board, board.otherPlayer(player));
+}
+
+//----------------------------------------------------------------------------------------
+std::vector<std::tuple<size_t, size_t> > Game::AI::movesLeadingToTwoWinOpportunities(
+      const Board &board, Board::Cell::State player) {
+  std::vector<std::tuple<size_t, size_t> > brilliant_moves;
+  for (const auto & move : board.possibleMoves()) {
+    auto [row, column] = move;
+    const Board next_position = boardAfterMove(row, column, player, board);
+    std::clog << "Next position after move " << move << std::endl
+        << next_position << std::endl;
+    auto next_winner_moves = winnerMoves(next_position, player);
+    std::clog << "next_winner_moves" << std::endl;
+    for ( const auto & t : next_winner_moves) {
+      std::clog << t << " ";
+    }
+    std::clog << std::endl;
+    if (2u == next_winner_moves.size()) {
+      brilliant_moves.push_back({row, column});
+    }
+  }
+
+  return brilliant_moves;
 }

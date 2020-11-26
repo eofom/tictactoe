@@ -2,6 +2,8 @@
 
 #include "board.h"
 #include "game.h"
+using namespace std;
+
 
 //------------------------------------------------------------------------------
 class TestGameBoard : public ::testing::Test {
@@ -293,25 +295,46 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
 
 //------------------------------------------------------------------------------
 TEST_F(TestGameAI, testWinnerMoves) {
-      Game::AI ai;
-      // X | _ \ _
-      // x | x | _
-      // _ | x | _
-      {
-        Board board;
-        board.setCellState(0, 0, Board::Cell::State::X);
-        board.setCellState(1, 0, Board::Cell::State::X);
-        board.setCellState(1, 1, Board::Cell::State::X);
-        board.setCellState(2, 1, Board::Cell::State::X);
-        auto cells = ai.winnerMoves(board, Board::Cell::State::X);
-        ASSERT_EQ(4u, cells.size());
-        ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{2,0}));
-        ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{0,1}));
-        ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{1,2}));
-        ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{2,2}));
-      }
+  Game::AI ai;
+
+  // X | _ \ _
+  // x | x | _
+  // _ | x | _
+  {
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::X);
+    board.setCellState(1, 0, Board::Cell::State::X);
+    board.setCellState(1, 1, Board::Cell::State::X);
+    board.setCellState(2, 1, Board::Cell::State::X);
+    auto cells = ai.winnerMoves(board, Board::Cell::State::X);
+    ASSERT_EQ(4u, cells.size());
+    ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{2,0}));
+    ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{0,1}));
+    ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{1,2}));
+    ASSERT_NE(cells.end(), std::find(cells.begin(), cells.end(), std::tuple{2,2}));
+  }
 }
+
 //------------------------------------------------------------------------------
+TEST_F(TestGameAI, testMovesLeadingToTwoWinOpportunities) {
+  Game::AI ai;
+
+  // _ | O | O
+  // _ | X | _
+  // X | _ | _
+  {
+    Board board = Board::Create({ {1,1}, {0,1}, {2,0}, {0,2} });
+    std::clog << board << std::endl;
+    auto moves = ai.movesLeadingToTwoWinOpportunities(board, Board::Cell::State::X);
+    for (auto [row, column] : moves) {
+      std::clog << "["s << row << ","s << column << "]"s << std::endl;
+    }
+    // FIXME
+    ASSERT_NE(moves.end(), std::find(moves.begin(), moves.end(), std::tuple{0,0}));
+    ASSERT_NE(moves.end(), std::find(moves.begin(), moves.end(), std::tuple{2,2}));
+  }
+}
+
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <tuple>
 
 static const size_t ROWLENGTH = 3;
 static const size_t COLUMNLENGTH = 3;
@@ -64,7 +65,7 @@ struct Board {
 
   bool isWinnerO();
 
-  std::vector<Cell> possibleMoves();
+  std::vector<std::tuple<size_t, size_t>> possibleMoves() const;
 
   enum class GameState {
     Pending = 0,
@@ -85,6 +86,7 @@ struct Board {
 
 
 std::ostream & operator<<(std::ostream & os, const Board & board);
+std::ostream & operator<<(std::ostream & os, const std::tuple<size_t, size_t> & t);
 
 
 #endif // BOARD_H

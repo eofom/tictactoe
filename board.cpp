@@ -5,6 +5,7 @@
 
 using namespace std;
 
+//------------------------------------------------------------------------------
 Board::Board()
 {
   for (size_t row = 0; row < COLUMNLENGTH; ++row) {
@@ -14,6 +15,7 @@ Board::Board()
   }
 }
 
+//------------------------------------------------------------------------------
 Board::Cell::State Board::otherPlayer(Board::Cell::State player) {
   Cell::State other = Cell::State::Open;
   switch (player) {
@@ -28,15 +30,18 @@ Board::Cell::State Board::otherPlayer(Board::Cell::State player) {
   return other;
 }
 
+//------------------------------------------------------------------------------
 Board::Cell::State Board::getCellState(size_t row, size_t column) const {
   return cells[ROWLENGTH * row + column].state;
 }
 
+//------------------------------------------------------------------------------
 /** FIXME Check dimensions? */
 void Board::setCellState(size_t row, size_t column, Board::Cell::State state) {
   cells[ROWLENGTH * row + column].state = state;
 }
 
+//------------------------------------------------------------------------------
 bool Board::isRowFilled(size_t row, Board::Cell::State player) {
   // FIXME
   size_t start = ROWLENGTH * row;
@@ -49,6 +54,7 @@ bool Board::isRowFilled(size_t row, Board::Cell::State player) {
                      owned_by_player);
 }
 
+//------------------------------------------------------------------------------
 bool Board::isColumnFilled(size_t column, Board::Cell::State player) {
   // FIXME
   bool ans = true;
@@ -59,6 +65,7 @@ bool Board::isColumnFilled(size_t column, Board::Cell::State player) {
   return ans;
 }
 
+//------------------------------------------------------------------------------
 bool Board::isTopLeftDiagonalFilled(Board::Cell::State player) {
   // FIXME
   return getCellState(0,0) == player
@@ -66,6 +73,7 @@ bool Board::isTopLeftDiagonalFilled(Board::Cell::State player) {
       && getCellState(2,2) == player;
 }
 
+//------------------------------------------------------------------------------
 bool Board::isBottomLeftDiagonalFilled(Board::Cell::State player) {
   // FIXME
   return getCellState(0,2) == player
@@ -73,6 +81,7 @@ bool Board::isBottomLeftDiagonalFilled(Board::Cell::State player) {
       && getCellState(2,0) == player;
 }
 
+//------------------------------------------------------------------------------
 bool Board::isWinner(Board::Cell::State player) {
   return isRowFilled(0, player)
       || isRowFilled(1, player)
@@ -84,24 +93,30 @@ bool Board::isWinner(Board::Cell::State player) {
       || isBottomLeftDiagonalFilled(player);
 }
 
+//------------------------------------------------------------------------------
 bool Board::isWinnerX() {
   return isWinner(Cell::State::X);
 }
 
+//------------------------------------------------------------------------------
 bool Board::isWinnerO() {
   return isWinner(Cell::State::O);
 }
 
-std::vector<Board::Cell> Board::possibleMoves() {
-  std::vector<Board::Cell> moves;
-  std::copy_if(cells.begin(), cells.end(), std::back_inserter(moves),
-               [] (const Cell & cell) {
-                 return Cell::State::Open == cell.state;
-               });
+//------------------------------------------------------------------------------
+std::vector<std::tuple<size_t, size_t> > Board::possibleMoves() const {
+  std::vector<std::tuple<size_t, size_t> > moves;
+  for (const auto & cell : cells) {
+    if (Cell::State::Open == cell.state) {
+      moves.push_back({cell.row, cell.column});
+      std::clog << "Possible move: " << std::tuple{cell.row, cell.column} << std::endl;
+    }
+  }
 
   return moves;
 }
 
+//------------------------------------------------------------------------------
 Board::GameState Board::checkGameState() {
   GameState ans = GameState::Pending;
   if (isWinnerX()) {
@@ -117,6 +132,7 @@ Board::GameState Board::checkGameState() {
   return ans;
 }
 
+//------------------------------------------------------------------------------
 Board Board::Create(const std::vector<Move> &moves) {
   Board board;
   Cell::State player = Cell::State::X;
@@ -165,3 +181,9 @@ bool operator ==(const Board::Move & lhs, const Board::Move rhs) {
 }
 
 
+
+ostream &operator<<(ostream &os, const std::tuple<size_t, size_t> &t)
+{
+  auto [row, column] = t;
+  return os << "["s << row << ","s << column << "]"s;
+}
