@@ -1,5 +1,7 @@
 #include "game.h"
 
+using namespace std;
+
 //----------------------------------------------------------------------------------------
 Game::Game()
 {
@@ -114,14 +116,15 @@ bool Game::AI::leftTopDiagonalHasWinnerMove(const Board &board, Board::Cell::Sta
   bool result = false;
   size_t cells_checked_by_player = 0;
   for (size_t row = 0; row < board.rowCount(); ++row) {
-    Board::Cell::State state = board.getCellState(row, row);
+    size_t column = row;
+    Board::Cell::State state = board.getCellState(row, column);
     if (state == player) {
       ++cells_checked_by_player;
     } else if (state == board.otherPlayer(player)) {
       break;
     } else {
       // Empty cell is candidate to be a winner move
-      winner_move = { row, row };
+      winner_move = { row, column };
     }
 
     result = (board.rowCount() - 1 == cells_checked_by_player);
@@ -131,10 +134,26 @@ bool Game::AI::leftTopDiagonalHasWinnerMove(const Board &board, Board::Cell::Sta
 }
 
 //----------------------------------------------------------------------------------------
-bool Game::AI::leftBottomDiagonalHasWinnerMove(const Board &board, Board::Cell::State player, std::tuple<size_t, size_t> &coords)
+bool Game::AI::leftBottomDiagonalHasWinnerMove(const Board &board, Board::Cell::State player, std::tuple<size_t, size_t> &winner_move)
 {
   bool result = false;
-  // FIXME
+  size_t cells_checked_by_player = 0;
+  for (size_t column = 0; column < board.columnCount(); ++column) {
+    size_t row = board.columnCount() - 1 - column;
+//    std::clog << "["s << row << ", "s << column << "]"s << std::endl;
+    Board::Cell::State state = board.getCellState(row, column);
+    if (state == player) {
+      ++cells_checked_by_player;
+    } else if (state == board.otherPlayer(player)) {
+      break;
+    } else {
+      // Empty cell is candidate to be a winner move
+      winner_move = { row, column };
+    }
+
+    result = (board.columnCount() - 1 == cells_checked_by_player);
+  }
+
   return result;
 }
 

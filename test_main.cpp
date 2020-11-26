@@ -256,24 +256,41 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
 }
 
 //------------------------------------------------------------------------------
-  TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
-    Game::AI ai;
+TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
+  Game::AI ai;
 
-    // X | _ | _
-    // O | X | _
-    // _ | _ | _
-    {
-      Board board = Board::Create({ {0,0}, {0,1}, {1,1} });
-      std::tuple<size_t, size_t> move;
-      ASSERT_TRUE(ai.leftTopDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
-      auto [row, column] = move;
-      ASSERT_EQ(2u, row);
-      ASSERT_EQ(2u, column);
-      ASSERT_FALSE(ai.leftTopDiagonalHasWinnerMove(board, Board::Cell::State::O, move));
-    }
+  // X | O | _
+  // _ | X | _
+  // _ | _ | _
+  {
+    Board board = Board::Create({ {0,0}, {0,1}, {1,1} });
+    std::tuple<size_t, size_t> move;
+    ASSERT_TRUE(ai.leftTopDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
+    auto [row, column] = move;
+    ASSERT_EQ(2u, row);
+    ASSERT_EQ(2u, column);
+    ASSERT_FALSE(ai.leftTopDiagonalHasWinnerMove(board, Board::Cell::State::O, move));
   }
+}
 
 //------------------------------------------------------------------------------
+TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
+  Game::AI ai;
+
+  // _ | O | X
+  // _ | X | _
+  // _ | _ | _
+  {
+    Board board = Board::Create({ {0,2}, {0,1}, {1,1} });
+    std::tuple<size_t, size_t> move;
+    ASSERT_TRUE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
+    auto [ row, column ] = move;
+    ASSERT_EQ(2u, row);
+    ASSERT_EQ(0, column);
+    ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::O, move));
+  }
+}
+
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
