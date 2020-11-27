@@ -79,6 +79,8 @@ struct Board {
 
   GameState checkGameState();
 
+  void clear();
+
   static Board Create(const std::vector<Move> & moves);
 
   static Cell::State otherPlayer(Cell::State player);

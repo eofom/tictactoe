@@ -8,7 +8,14 @@
 class Game
 {
 public:
-  Game();
+  enum class Player {
+    Human = 0,
+    AI
+  };
+
+  Game(Player x, Player o);
+
+  void play();
 
   void playHumanVsHuman();
   void playHumanVsAI(Board::Cell::State human_player);
@@ -38,6 +45,8 @@ private:
   std::tuple<size_t, size_t> askForMove();
   std::tuple<size_t, size_t> numberToCellCoordinates(size_t number);
 
+  Player player_x_;
+  Player player_o_;
   Board board_;
 };
 

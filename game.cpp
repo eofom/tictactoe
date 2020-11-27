@@ -6,9 +6,22 @@
 using namespace std;
 
 //----------------------------------------------------------------------------------------
-Game::Game()
-{
+Game::Game(Game::Player x, Game::Player o)
+  : player_x_(x),
+    player_o_(o)
+{}
 
+//----------------------------------------------------------------------------------------
+void Game::play()
+{
+  board_.clear();
+  if (Player::AI == player_x_) {
+    playHumanVsAI(Board::Cell::State::O);
+  } else if (Player::AI == player_o_) {
+    playHumanVsAI(Board::Cell::State::X);
+  } else {
+    playHumanVsHuman();
+  }
 }
 
 //----------------------------------------------------------------------------------------

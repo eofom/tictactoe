@@ -153,6 +153,16 @@ Board::GameState Board::checkGameState() {
 }
 
 //------------------------------------------------------------------------------
+void Board::clear()
+{
+  for (size_t row = 0; row < rowCount(); ++row) {
+    for (size_t column = 0; column < columnCount(); ++column) {
+      setCellState(row, column, Cell::State::Open);
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
 Board Board::Create(const std::vector<Move> &moves) {
   Board board;
   Cell::State player = Cell::State::X;

@@ -36,23 +36,30 @@ std::istream & ReadAllMoves(std::istream & is, std::vector<Board::Move> & moves)
 
 //------------------------------------------------------------------------------
 int main() {
-  Game game;
-  game.playHumanVsAI(Board::Cell::State::X);
+  std::cout << "Who would you like to play? [X,O]? ";
+  char me = ' ';
+  while ( 'x' != me && 'o' != me ) {
+    std::cin >> me;
+    me = std::tolower(me);
+  }
 
-//  std::vector<Board::Move> moves;
-//  ReadAllMoves(std::cin, moves);
+  std::cout << "Would you like to play vs. Human or AI? [H,A]? ";
+  char buddy = ' ';
+  while ( 'h' != buddy && 'a' != buddy ) {
+    std::cin >> buddy;
+    buddy = std::tolower(buddy);
+  }
 
-////  std::clog << moves.size() << " moves were made" << std::endl;
-//  Board board = Board::Create(moves);
-//  std::cout << board << std::endl;
+  Game::Player player_x = Game::Player::Human;
+  Game::Player player_o = Game::Player::Human;
+  if ('a' == buddy) {
+    if ('x' == me) {
+      player_o = Game::Player::AI;
+    } else {
+      player_x = Game::Player::AI;
+    }
+  }
 
-//  if (board.isWinnerX()) {
-//    std::cout << "A" << std::endl;
-//  } else if (board.isWinnerO()) {
-//    std::cout << "B" << std::endl;
-//  } else if (board.possibleMoves().empty()) {
-//    std::cout << "Draw" << std::endl;
-//  } else {
-//    std::cout << "Pending" << std::endl;
-//  }
+  Game game(player_x, player_o);
+  game.play();
 }
