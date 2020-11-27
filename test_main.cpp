@@ -727,7 +727,7 @@ TEST_F(TestGameAI, testMovesLeadingToTwoWinOpportunities) {
   // X | _ | _
   {
     Board board = Board::Create({ {1,1}, {0,1}, {2,0}, {0,2} });
-    std::clog << board << std::endl;
+//    std::clog << board << std::endl;
     auto moves = ai.movesLeadingToTwoWinOpportunities(board, Board::Cell::State::X);
 //    std::clog << "testMovesLeadingToTwoWinOpportunities:\n"
 //              << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
@@ -742,6 +742,26 @@ TEST_F(TestGameAI, testMovesLeadingToTwoWinOpportunities) {
 }
 
 //------------------------------------------------------------------------------
+TEST_F(TestGameAI, testBestMove) {
+  Game::AI ai;
+
+  // O | _ | _
+  // _ | X | _
+  // X | _ | _
+  {
+    Board board = Board::Create({ {1,1}, {0,0}, {2,0} });
+    ASSERT_EQ(ai.bestMove(board, Board::Cell::State::O), (std::tuple{0,2u}));
+  }
+
+  // _ | O | O
+  // _ | X | _
+  // X | _ | _
+  {
+    Board board = Board::Create({ {1,1}, {0,1}, {2,0}, {0,2} });
+    ASSERT_EQ(ai.bestMove(board, Board::Cell::State::X), (std::tuple{0,0}));
+  }
+}
+
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------

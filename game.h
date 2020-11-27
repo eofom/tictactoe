@@ -10,12 +10,15 @@ class Game
 public:
   Game();
 
-  void play();
+  void playHumanVsHuman();
+  void playHumanVsAI(Board::Cell::State human_player);
+
+  bool move(Board & board, Board::Cell::State player,
+            const std::tuple<size_t, size_t> & coordinates);
 
   class AI {
   public:
-    std::tuple<size_t, size_t> move(const Board & board, Board::Cell::State player);
-
+    std::tuple<size_t, size_t> bestMove(const Board & board, Board::Cell::State player);
     std::set<std::tuple<size_t, size_t> > winnerMoves(const Board & board, Board::Cell::State player);
     std::set<std::tuple<size_t, size_t> > loserMoves(const Board & board, Board::Cell::State player);
     std::set<std::tuple<size_t, size_t> > movesLeadingToTwoWinOpportunities(const Board & board, Board::Cell::State player);

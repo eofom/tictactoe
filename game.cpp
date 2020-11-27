@@ -1,5 +1,8 @@
 #include "game.h"
 
+#include <algorithm>
+#include <limits>
+
 using namespace std;
 
 //----------------------------------------------------------------------------------------
@@ -9,7 +12,7 @@ Game::Game()
 }
 
 //----------------------------------------------------------------------------------------
-void Game::play() {
+void Game::playHumanVsHuman() {
   Board::Cell::State player = Board::Cell::State::X;
   while ( !board_.isWinnerX()
           && !board_.isWinnerO()
@@ -28,6 +31,45 @@ void Game::play() {
   } else if (board_.possibleMoves().empty()) {
     std::cout << "Draw... Try again." << std::endl;
   }
+}
+
+//----------------------------------------------------------------------------------------
+void Game::playHumanVsAI(Board::Cell::State human_player)
+{
+  AI ai;
+  auto ai_player = board_.otherPlayer(human_player);
+  while ( !board_.isWinnerX()
+          && !board_.isWinnerO()
+          && !board_.possibleMoves().empty() ) {
+    std::cout << std::endl << board_ << std::endl<< std::endl;
+    // Human moves
+    auto [row, column] = askForMove();
+    board_.setCellState(row, column, human_player);
+    // AI moves
+    move(board_, ai_player, ai.bestMove(board_, ai_player));
+  }
+  std::cout << std::endl << board_ << std::endl<< std::endl;
+
+  if (board_.isWinnerX()) {
+    std::cout << "X WINS!!!" << std::endl;
+  } else if (board_.isWinnerO()) {
+    std::cout << "O WINS!!!" << std::endl;
+  } else if (board_.possibleMoves().empty()) {
+    std::cout << "Draw... Try again." << std::endl;
+    }
+  }
+
+//----------------------------------------------------------------------------------------
+bool Game::move(Board &board, Board::Cell::State player,
+                const std::tuple<size_t, size_t> & coordinates) {
+  bool success = false;
+  if (board.isPossibleMove(coordinates)) {
+    auto [row, column] = coordinates;
+    board.setCellState(row, column, player);
+    success = true;
+  }
+
+  return success;
 }
 
 //----------------------------------------------------------------------------------------
@@ -175,6 +217,41 @@ Board Game::AI::boardAfterMove(size_t row, size_t column, Board::Cell::State pla
   next_board.setCellState(row, column, player);
 
   return next_board;
+}
+
+//----------------------------------------------------------------------------------------
+std::tuple<size_t, size_t> Game::AI::bestMove(const Board &board,
+                                              Board::Cell::State player) {
+  auto winner_moves = winnerMoves(board, player);
+  if (!winner_moves.empty()) {
+    return (*winner_moves.begin());
+  }
+
+  auto loser_moves = loserMoves(board, player);
+  if (!loser_moves.empty()) {
+    return (*loser_moves.begin());
+  }
+
+  std::tuple<size_t, size_t> center_move = {1u,1u};
+  if (board.isPossibleMove(center_move)) {
+    return center_move;
+  }
+
+  auto possible_moves = board.possibleMoves();
+  auto pred_diagonal_move = [&board](const std::tuple<size_t, size_t> move) {
+    auto [row, column] = move;
+    return row == column
+        || row == board.columnCount() - 1 - column;
+  };
+  const auto lookup = std::find_if(possible_moves.begin(), possible_moves.end(),
+        pred_diagonal_move);
+  if (possible_moves.end() != lookup) {
+      return (*lookup);
+  }
+
+  // FIXME otherwise return invalid move
+  return std::tuple{std::numeric_limits<size_t>::max(),
+                    std::numeric_limits<size_t>::max()};
 }
 
 //----------------------------------------------------------------------------------------

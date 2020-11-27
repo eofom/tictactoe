@@ -119,7 +119,7 @@ std::set<std::tuple<size_t, size_t> > Board::possibleMoves() const {
 }
 
 //------------------------------------------------------------------------------
-bool Board::isPossibleMove(size_t row, size_t column, Board::Cell::State player)
+bool Board::isPossibleMove(size_t row, size_t column) const
 {
   bool ans = false;
   if (row < rowCount() && column < columnCount()) {
@@ -127,6 +127,13 @@ bool Board::isPossibleMove(size_t row, size_t column, Board::Cell::State player)
   }
 
   return ans;
+}
+
+//------------------------------------------------------------------------------
+bool Board::isPossibleMove(std::tuple<size_t, size_t> coordinates) const
+{
+  auto [row, column] = coordinates;
+  return isPossibleMove(row, column);
 }
 
 //------------------------------------------------------------------------------

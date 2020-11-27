@@ -37,7 +37,7 @@ std::istream & ReadAllMoves(std::istream & is, std::vector<Board::Move> & moves)
 //------------------------------------------------------------------------------
 int main() {
   Game game;
-  game.play();
+  game.playHumanVsAI(Board::Cell::State::X);
 
 //  std::vector<Board::Move> moves;
 //  ReadAllMoves(std::cin, moves);

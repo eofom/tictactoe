@@ -67,7 +67,8 @@ struct Board {
   bool isWinnerO();
 
   std::set<std::tuple<size_t, size_t> > possibleMoves() const;
-  bool isPossibleMove(size_t row, size_t column, Board::Cell::State player);
+  bool isPossibleMove(size_t row, size_t column) const;
+  bool isPossibleMove(std::tuple<size_t, size_t> coordinates) const;
 
   enum class GameState {
     Pending = 0,
