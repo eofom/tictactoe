@@ -159,6 +159,17 @@ protected:
 TEST_F(TestGameAI, testRowHasWinnerMove) {
   Game::AI ai;
 
+  // X | _ | _
+  {
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::X);
+    board.setCellState(0, 1, Board::Cell::State::Open);
+    board.setCellState(0, 2, Board::Cell::State::Open);
+    std::tuple<size_t, size_t> move;
+    ASSERT_FALSE(ai.rowHasWinnerMove(board, 0, Board::Cell::State::X, move));
+    ASSERT_FALSE(ai.rowHasWinnerMove(board, 0, Board::Cell::State::O, move));
+  }
+
   // X | X | _
   {
     Board board;
@@ -253,17 +264,44 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
   // _ | _ | _
   {
     // TODO
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::Open);
+    board.setCellState(0, 1, Board::Cell::State::Open);
+    board.setCellState(0, 2, Board::Cell::State::Open);
+    std::tuple<size_t, size_t> move;
+    ASSERT_FALSE(ai.rowHasWinnerMove(board, 0, Board::Cell::State::X, move));
+    ASSERT_FALSE(ai.rowHasWinnerMove(board, 0, Board::Cell::State::O, move));
   }
 
   // X | X | X
   {
     // TODO
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::X);
+    board.setCellState(0, 1, Board::Cell::State::X);
+    board.setCellState(0, 2, Board::Cell::State::X);
+    std::tuple<size_t, size_t> move;
+    ASSERT_FALSE(ai.rowHasWinnerMove(board, 0, Board::Cell::State::X, move));
+    ASSERT_FALSE(ai.rowHasWinnerMove(board, 0, Board::Cell::State::O, move));
   }
 }
 
 //------------------------------------------------------------------------------
 TEST_F(TestGameAI, testColumnHasWinnerMove) {
   Game::AI ai;
+
+  // X
+  // _
+  // _
+  {
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::X);
+    board.setCellState(1, 0, Board::Cell::State::Open);
+    board.setCellState(2, 0, Board::Cell::State::Open);
+    std::tuple<size_t, size_t> move;
+    ASSERT_FALSE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::X, move));
+    ASSERT_FALSE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::O, move));
+  }
 
   // X
   // X
@@ -364,24 +402,30 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
     ASSERT_FALSE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::O, move));
   }
 
-  // X
+  // _
   // _
   // _
   {
-    Board board = Board::Create({ {0,0} });
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::Open);
+    board.setCellState(1, 0, Board::Cell::State::Open);
+    board.setCellState(2, 0, Board::Cell::State::Open);
     std::tuple<size_t, size_t> move;
     ASSERT_FALSE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::X, move));
     ASSERT_FALSE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::O, move));
   }
 
-  // _ | _ | _
+  // X
+  // X
+  // X
   {
-    // TODO
-  }
-
-  // X | X | X
-  {
-    // TODO
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::X);
+    board.setCellState(1, 0, Board::Cell::State::X);
+    board.setCellState(2, 0, Board::Cell::State::X);
+    std::tuple<size_t, size_t> move;
+    ASSERT_FALSE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::X, move));
+    ASSERT_FALSE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::O, move));
   }
 }
 
