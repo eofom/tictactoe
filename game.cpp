@@ -250,10 +250,30 @@ std::tuple<size_t, size_t> Game::AI::bestMove(const Board &board,
     return (*loser_moves.begin());
   }
 
+  auto brilliant_moves = movesLeadingToTwoWinOpportunities(board, player);
+  if (!brilliant_moves.empty()) {
+//    std::clog << "Brilliant moves: ";
+//    for (const auto & t : brilliant_moves) {
+//      std::clog << t << " ";
+//    }
+//    std::clog << std::endl;
+    return(*brilliant_moves.begin());
+  }
+
   std::tuple<size_t, size_t> center_move = {1u,1u};
   if (board.isPossibleMove(center_move)) {
     return center_move;
   }
+
+  // FIXME Prefer to continue lines which doesn't have enemy marks yet
+  /*
+   * In this position
+   *
+   * _ | _ | _
+   * _ | X | _
+   * _ | _ | O
+   *
+   * prefer diagonal moves {2,0}, {0,2} rather than {0,0} */
 
   auto possible_moves = board.possibleMoves();
   auto pred_diagonal_move = [&board](const std::tuple<size_t, size_t> move) {
@@ -310,17 +330,18 @@ std::set<std::tuple<size_t, size_t> > Game::AI::loserMoves(const Board &board,
 std::set<std::tuple<size_t, size_t> > Game::AI::movesLeadingToTwoWinOpportunities(
       const Board &board, Board::Cell::State player) {
   std::set<std::tuple<size_t, size_t> > brilliant_moves;
+//  std::clog << "Current board:" << std::endl << board << std::endl;
   for (const auto & move : board.possibleMoves()) {
     auto [row, column] = move;
     const Board next_position = boardAfterMove(row, column, player, board);
-    std::clog << "Next position after move " << move << std::endl
-        << next_position << std::endl;
+//    std::clog << "Next position after move " << move << std::endl
+//        << next_position << std::endl;
     auto next_winner_moves = winnerMoves(next_position, player);
-    std::clog << "next_winner_moves" << std::endl;
-    for ( const auto & t : next_winner_moves) {
-      std::clog << t << " ";
-    }
-    std::clog << std::endl;
+//    std::clog << "next_winner_moves" << std::endl;
+//    for ( const auto & t : next_winner_moves) {
+//      std::clog << t << " ";
+//    }
+//    std::clog << std::endl;
     if (2u == next_winner_moves.size()) {
       brilliant_moves.emplace(row, column);
     }

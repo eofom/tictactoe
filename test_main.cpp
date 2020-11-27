@@ -774,7 +774,11 @@ TEST_F(TestGameAI, testBestMove) {
   // _ | _ | O
   {
     Board board = Board::Create({ {1,1}, {0,1}, {0,0}, {2,2} });
-    ASSERT_EQ(ai.bestMove(board, Board::Cell::State::X), (std::tuple{2,0}));
+    const auto best_move = ai.bestMove(board, Board::Cell::State::X);
+    bool cell10 = std::tuple{1,0} == best_move;
+    bool cell20 = std::tuple{2,0} == best_move;
+    ASSERT_TRUE( cell10 || cell20 );
+
   }
 }
 
