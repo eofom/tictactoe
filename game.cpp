@@ -68,12 +68,14 @@ bool Game::AI::rowHasWinnerMove(const Board &board, size_t row,
                                 std::tuple<size_t, size_t> & winner_move) {
   bool result = false;
   if (row < board.rowCount()) {
+    bool has_enemy_cells = false;
     size_t cells_checked_by_player = 0;
     for (size_t column = 0; column < board.columnCount(); ++column) {
       Board::Cell::State state = board.getCellState(row, column);
       if (state == player) {
         ++cells_checked_by_player;
       } else if (state == board.otherPlayer(player)) {
+        has_enemy_cells = true;
         break;
       } else {
         // Empty cell is candidate to be a winner move
@@ -81,7 +83,8 @@ bool Game::AI::rowHasWinnerMove(const Board &board, size_t row,
       }
     }
 
-    result = (board.columnCount() - 1 == cells_checked_by_player);
+    result = !has_enemy_cells
+        && (board.columnCount() - 1 == cells_checked_by_player);
   }
 
   return result;
