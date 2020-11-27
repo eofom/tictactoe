@@ -31,6 +31,11 @@ public:
     std::set<std::tuple<size_t, size_t> > movesLeadingToTwoWinOpportunities(const Board & board, Board::Cell::State player);
     std::vector<std::tuple<size_t, size_t>> goodMoves(const Board & board, Board::Cell::State player);
 
+    bool rowHasCellOwnedByPlayer(const Board & board, size_t row, Board::Cell::State player);
+    bool columnHasCellOwnedByPlayer(const Board & board, size_t column, Board::Cell::State player);
+    bool leftTopDiagonalHasCellOwnedByPlayer(const Board & board, Board::Cell::State player);
+    bool leftBottomDiagonalHasCellOwnedByPlayer(const Board & board, Board::Cell::State player);
+
     bool rowHasWinnerMove(const Board & board, size_t row, Board::Cell::State player, std::tuple<size_t, size_t> & winner_move);
     bool columnHasWinnerMove(const Board & board, size_t column, Board::Cell::State player, std::tuple<size_t, size_t> & winner_move);
     bool leftTopDiagonalHasWinnerMove(const Board & board, Board::Cell::State player, std::tuple<size_t, size_t> & winner_move);

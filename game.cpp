@@ -349,3 +349,66 @@ std::set<std::tuple<size_t, size_t> > Game::AI::movesLeadingToTwoWinOpportunitie
 
   return brilliant_moves;
 }
+
+//----------------------------------------------------------------------------------------
+bool Game::AI::rowHasCellOwnedByPlayer(const Board &board, size_t row,
+                                       Board::Cell::State player) {
+  bool ans = false;
+  if (row < board.rowCount()) {
+    for (size_t column = 0; column < board.columnCount(); ++column) {
+      if (board.getCellState(row, column) == player) {
+        ans = true;
+        break;
+      }
+    }
+  }
+
+  return ans;
+}
+
+//----------------------------------------------------------------------------------------
+bool Game::AI::columnHasCellOwnedByPlayer(const Board &board, size_t column,
+                                          Board::Cell::State player) {
+  bool ans = false;
+  if (column < board.columnCount()) {
+    for (size_t row = 0; row < board.rowCount(); ++row) {
+      if (board.getCellState(row, column) == player) {
+        ans = true;
+        break;
+      }
+    }
+  }
+
+  return ans;
+}
+
+//----------------------------------------------------------------------------------------
+bool Game::AI::leftTopDiagonalHasCellOwnedByPlayer(const Board &board,
+                                                   Board::Cell::State player) {
+  bool ans = false;
+  for (size_t row = 0; row < board.rowCount(); ++row) {
+    for (size_t column = 0; column < board.columnCount(); ++column) {
+      if (board.getCellState(row, column) == player) {
+        ans = true;
+        break;
+      }
+    }
+  }
+
+  return ans;
+}
+
+//----------------------------------------------------------------------------------------
+bool Game::AI::leftBottomDiagonalHasCellOwnedByPlayer(const Board &board,
+                                                      Board::Cell::State player) {
+  bool ans = false;
+  for (size_t column = 0; column < board.columnCount(); ++column) {
+    size_t row = board.columnCount() - 1 - column;
+    if (board.getCellState(row, column) == player) {
+      ans = true;
+      break;
+    }
+  }
+
+  return ans;
+}
