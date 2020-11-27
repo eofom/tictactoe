@@ -8,8 +8,8 @@ using namespace std;
 //------------------------------------------------------------------------------
 Board::Board()
 {
-  for (size_t row = 0; row < COLUMNLENGTH; ++row) {
-    for (size_t column = 0; column < ROWLENGTH; ++column) {
+  for (size_t row = 0; row < rowCount(); ++row) {
+    for (size_t column = 0; column < columnCount(); ++column) {
       cells.push_back(Cell(row, column));
     }
   }
@@ -33,7 +33,7 @@ Board::Cell::State Board::otherPlayer(Board::Cell::State player) {
 //------------------------------------------------------------------------------
 /** FIXME Check dimensions? */
 Board::Cell::State Board::getCellState(size_t row, size_t column) const {
-  return cells[ROWLENGTH * row + column].state;
+  return cells[columnCount() * row + column].state;
 }
 
 //------------------------------------------------------------------------------
@@ -46,13 +46,13 @@ void Board::setCellState(size_t row, size_t column, Board::Cell::State state) {
 //------------------------------------------------------------------------------
 bool Board::isRowFilled(size_t row, Board::Cell::State player) {
   // FIXME
-  size_t start = ROWLENGTH * row;
+  size_t start = columnCount() * row;
   auto owned_by_player = [player](const Cell & cell) {
     return cell.state == player;
   };
 
   return std::all_of(cells.begin() + start,
-                     cells.begin() + start + ROWLENGTH,
+                     cells.begin() + start + columnCount(),
                      owned_by_player);
 }
 
@@ -60,7 +60,7 @@ bool Board::isRowFilled(size_t row, Board::Cell::State player) {
 bool Board::isColumnFilled(size_t column, Board::Cell::State player) {
   // FIXME
   bool ans = true;
-  for (size_t row = 0; row < ROWLENGTH; ++row) {
+  for (size_t row = 0; row < columnCount(); ++row) {
     ans &= getCellState(row, column) == player;
   }
 
@@ -168,7 +168,7 @@ std::ostream & operator<<(std::ostream & os, const Board::Cell & cell) {
     os << 'X';
     break;
   case Board::Cell::State::Open:
-    os << (cell.row * COLUMNLENGTH + cell.column + 1);
+    os << (cell.row * BOARD_COLUMN_COUNT + cell.column + 1);
     break;
   }
 

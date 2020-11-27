@@ -6,8 +6,8 @@
 #include <set>
 #include <tuple>
 
-static const size_t ROWLENGTH = 3;
-static const size_t COLUMNLENGTH = 3;
+static const size_t BOARD_ROW_COUNT = 3;
+static const size_t BOARD_COLUMN_COUNT = 3;
 
 struct Board {
   struct Move {
@@ -41,11 +41,11 @@ struct Board {
   Board();
 
   size_t rowCount() const {
-    return COLUMNLENGTH;
+    return BOARD_ROW_COUNT;
   }
 
   size_t columnCount() const {
-    return ROWLENGTH;
+    return BOARD_COLUMN_COUNT;
   }
 
   Cell::State getCellState(size_t row, size_t column) const;

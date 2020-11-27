@@ -39,7 +39,7 @@ std::tuple<size_t, size_t> Game::askForMove() {
     std::cin >> cell_number;
 
     auto [ row, column ] = numberToCellCoordinates(cell_number);
-    if (row < COLUMNLENGTH && column < ROWLENGTH) {
+    if (row < board_.rowCount() && column < board_.columnCount()) {
       if (board_.getCellState(row, column) == Board::Cell::State::Open) {
         coordinates = { row, column };
         break;
