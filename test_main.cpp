@@ -607,11 +607,14 @@ TEST_F(TestGameAI, testMovesLeadingToTwoWinOpportunities) {
     Board board = Board::Create({ {1,1}, {0,1}, {2,0}, {0,2} });
     std::clog << board << std::endl;
     auto moves = ai.movesLeadingToTwoWinOpportunities(board, Board::Cell::State::X);
-    for (auto [row, column] : moves) {
-      std::clog << "["s << row << ","s << column << "]"s << std::endl;
-    }
-    // FIXME
+//    std::clog << "testMovesLeadingToTwoWinOpportunities:\n"
+//              << "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
+//    for (auto [row, column] : moves) {
+//      std::clog << "["s << row << ","s << column << "]"s << std::endl;
+//    }
+    ASSERT_EQ(3u, moves.size());
     ASSERT_NE(moves.end(), std::find(moves.begin(), moves.end(), std::tuple{0,0}));
+    ASSERT_NE(moves.end(), std::find(moves.begin(), moves.end(), std::tuple{1,0}));
     ASSERT_NE(moves.end(), std::find(moves.begin(), moves.end(), std::tuple{2,2}));
   }
 }
