@@ -496,6 +496,82 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
     ASSERT_EQ(0, column);
     ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::O, move));
   }
+
+  // _ | _ | X
+  // _ | _ | _
+  // X | _ | _
+  {
+    // TODO
+    Board board;
+    board.setCellState(0, 2, Board::Cell::State::X);
+    board.setCellState(1, 1, Board::Cell::State::Open);
+    board.setCellState(2, 0, Board::Cell::State::X);
+    std::tuple<size_t, size_t> move;
+    ASSERT_TRUE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
+    auto [ row, column ] = move;
+    ASSERT_EQ(1u, row);
+    ASSERT_EQ(1u, column);
+    ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::O, move));
+  }
+
+  // _ | _ | _
+  // _ | X | _
+  // X | _ | _
+  {
+    // TODO
+    Board board;
+    board.setCellState(0, 2, Board::Cell::State::Open);
+    board.setCellState(1, 1, Board::Cell::State::X);
+    board.setCellState(2, 0, Board::Cell::State::X);
+    std::tuple<size_t, size_t> move;
+    ASSERT_TRUE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
+    auto [ row, column ] = move;
+    ASSERT_EQ(0, row);
+    ASSERT_EQ(2u, column);
+    ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::O, move));
+  }
+
+  // _ | _ | X
+  // _ | X | _
+  // O | _ | _
+  {
+    // TODO
+    Board board;
+    board.setCellState(0, 2, Board::Cell::State::X);
+    board.setCellState(1, 1, Board::Cell::State::X);
+    board.setCellState(2, 0, Board::Cell::State::O);
+    std::tuple<size_t, size_t> move;
+    ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
+    ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::O, move));
+  }
+
+  // _ | _ | X
+  // _ | O | _
+  // X | _ | _
+  {
+    // TODO
+    Board board;
+    board.setCellState(0, 2, Board::Cell::State::X);
+    board.setCellState(1, 1, Board::Cell::State::O);
+    board.setCellState(2, 0, Board::Cell::State::X);
+    std::tuple<size_t, size_t> move;
+    ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
+    ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::O, move));
+  }
+
+  // _ | _ | O
+  // _ | X | _
+  // X | _ | _
+  {
+    // TODO
+    Board board;
+    board.setCellState(0, 2, Board::Cell::State::O);
+    board.setCellState(1, 1, Board::Cell::State::X);
+    board.setCellState(2, 0, Board::Cell::State::X);
+    std::tuple<size_t, size_t> move;
+    ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
+    ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::O, move));
+  }
 }
 
 //------------------------------------------------------------------------------
