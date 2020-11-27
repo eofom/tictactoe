@@ -51,6 +51,11 @@ void Game::playHumanVsAI(Board::Cell::State human_player)
 {
   AI ai;
   auto ai_player = board_.otherPlayer(human_player);
+  // X always moves first
+  if (Board::Cell::State::X == ai_player) {
+    move(board_, ai_player, ai.bestMove(board_, ai_player));
+  }
+
   while ( !board_.isWinnerX()
           && !board_.isWinnerO()
           && !board_.possibleMoves().empty() ) {
