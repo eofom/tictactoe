@@ -146,25 +146,25 @@ bool Game::AI::leftTopDiagonalHasWinnerMove(const Board &board,
 bool Game::AI::leftBottomDiagonalHasWinnerMove(const Board &board,
                                                Board::Cell::State player,
                                                std::tuple<size_t, size_t> &winner_move) {
-  bool result = false;
   size_t cells_checked_by_player = 0;
+  bool has_enemy_cells = false;
   for (size_t column = 0; column < board.columnCount(); ++column) {
     size_t row = board.columnCount() - 1 - column;
-    std::clog << "leftBottomDiagonalHasWinnerMove ["s << row << ", "s << column << "]"s << std::endl;
+//    std::clog << "leftBottomDiagonalHasWinnerMove ["s << row << ", "s << column << "]"s << std::endl;
     Board::Cell::State state = board.getCellState(row, column);
     if (state == player) {
       ++cells_checked_by_player;
     } else if (state == board.otherPlayer(player)) {
+      has_enemy_cells = true;
       break;
     } else {
       // Empty cell is candidate to be a winner move
       winner_move = { row, column };
     }
-
-    result = (board.columnCount() - 1 == cells_checked_by_player);
   }
 
-  return result;
+  return !has_enemy_cells
+      && (board.columnCount() - 1 == cells_checked_by_player);
 }
 
 //----------------------------------------------------------------------------------------
