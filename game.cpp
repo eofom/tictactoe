@@ -168,6 +168,7 @@ bool Game::AI::leftBottomDiagonalHasWinnerMove(const Board &board,
 }
 
 //----------------------------------------------------------------------------------------
+/** FIXME Check if move is vald */
 Board Game::AI::boardAfterMove(size_t row, size_t column, Board::Cell::State player,
                                const Board &board) {
   Board next_board(board);
@@ -177,43 +178,43 @@ Board Game::AI::boardAfterMove(size_t row, size_t column, Board::Cell::State pla
 }
 
 //----------------------------------------------------------------------------------------
-std::vector<std::tuple<size_t, size_t> > Game::AI::winnerMoves(const Board &board,
+std::set<std::tuple<size_t, size_t> > Game::AI::winnerMoves(const Board &board,
                                                                Board::Cell::State player) {
-  std::vector<std::tuple<size_t, size_t> > winner_moves;
+  std::set<std::tuple<size_t, size_t> > winner_moves;
   std::tuple<size_t, size_t> cell;
   for (size_t row = 0; row < board.rowCount(); ++row) {
     if (rowHasWinnerMove(board, row, player, cell)) {
-      winner_moves.push_back(cell);
+      winner_moves.insert(cell);
     }
   }
 
   for (size_t column = 0; column < board.columnCount(); ++column) {
     if (columnHasWinnerMove(board, column, player, cell)) {
-      winner_moves.push_back(cell);
+      winner_moves.insert(cell);
     }
   }
 
   if (leftTopDiagonalHasWinnerMove(board, player, cell)) {
-    winner_moves.push_back(cell);
+    winner_moves.insert(cell);
   }
 
   if (leftBottomDiagonalHasWinnerMove(board, player, cell)) {
-    winner_moves.push_back(cell);
+    winner_moves.insert(cell);
   }
 
   return winner_moves;
 }
 
 //----------------------------------------------------------------------------------------
-std::vector<std::tuple<size_t, size_t> > Game::AI::loserMoves(const Board &board,
+std::set<std::tuple<size_t, size_t> > Game::AI::loserMoves(const Board &board,
                                                               Board::Cell::State player) {
   return winnerMoves(board, board.otherPlayer(player));
 }
 
 //----------------------------------------------------------------------------------------
-std::vector<std::tuple<size_t, size_t> > Game::AI::movesLeadingToTwoWinOpportunities(
+std::set<std::tuple<size_t, size_t> > Game::AI::movesLeadingToTwoWinOpportunities(
       const Board &board, Board::Cell::State player) {
-  std::vector<std::tuple<size_t, size_t> > brilliant_moves;
+  std::set<std::tuple<size_t, size_t> > brilliant_moves;
   for (const auto & move : board.possibleMoves()) {
     auto [row, column] = move;
     const Board next_position = boardAfterMove(row, column, player, board);
@@ -226,7 +227,7 @@ std::vector<std::tuple<size_t, size_t> > Game::AI::movesLeadingToTwoWinOpportuni
     }
     std::clog << std::endl;
     if (2u == next_winner_moves.size()) {
-      brilliant_moves.push_back({row, column});
+      brilliant_moves.emplace(row, column);
     }
   }
 

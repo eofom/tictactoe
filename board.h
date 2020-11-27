@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
 #include <tuple>
 
 static const size_t ROWLENGTH = 3;
@@ -65,7 +66,8 @@ struct Board {
 
   bool isWinnerO();
 
-  std::vector<std::tuple<size_t, size_t>> possibleMoves() const;
+  std::set<std::tuple<size_t, size_t> > possibleMoves() const;
+  bool isPossibleMove(size_t row, size_t column, Board::Cell::State player);
 
   enum class GameState {
     Pending = 0,

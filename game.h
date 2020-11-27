@@ -16,9 +16,9 @@ public:
   public:
     std::tuple<size_t, size_t> move(const Board & board, Board::Cell::State player);
 
-    std::vector<std::tuple<size_t, size_t>> winnerMoves(const Board & board, Board::Cell::State player);
-    std::vector<std::tuple<size_t, size_t>> loserMoves(const Board & board, Board::Cell::State player);
-    std::vector<std::tuple<size_t, size_t>> movesLeadingToTwoWinOpportunities(const Board & board, Board::Cell::State player);
+    std::set<std::tuple<size_t, size_t> > winnerMoves(const Board & board, Board::Cell::State player);
+    std::set<std::tuple<size_t, size_t> > loserMoves(const Board & board, Board::Cell::State player);
+    std::set<std::tuple<size_t, size_t> > movesLeadingToTwoWinOpportunities(const Board & board, Board::Cell::State player);
     std::vector<std::tuple<size_t, size_t>> goodMoves(const Board & board, Board::Cell::State player);
 
     bool rowHasWinnerMove(const Board & board, size_t row, Board::Cell::State player, std::tuple<size_t, size_t> & winner_move);

@@ -31,14 +31,16 @@ Board::Cell::State Board::otherPlayer(Board::Cell::State player) {
 }
 
 //------------------------------------------------------------------------------
+/** FIXME Check dimensions? */
 Board::Cell::State Board::getCellState(size_t row, size_t column) const {
   return cells[ROWLENGTH * row + column].state;
 }
 
 //------------------------------------------------------------------------------
-/** FIXME Check dimensions? */
 void Board::setCellState(size_t row, size_t column, Board::Cell::State state) {
-  cells[ROWLENGTH * row + column].state = state;
+  if (row < rowCount() && column < columnCount()) {
+    cells[columnCount() * row + column].state = state;
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -104,16 +106,27 @@ bool Board::isWinnerO() {
 }
 
 //------------------------------------------------------------------------------
-std::vector<std::tuple<size_t, size_t> > Board::possibleMoves() const {
-  std::vector<std::tuple<size_t, size_t> > moves;
+std::set<std::tuple<size_t, size_t> > Board::possibleMoves() const {
+  std::set<std::tuple<size_t, size_t> > moves;
   for (const auto & cell : cells) {
     if (Cell::State::Open == cell.state) {
-      moves.push_back({cell.row, cell.column});
-      std::clog << "Possible move: " << std::tuple{cell.row, cell.column} << std::endl;
+      moves.emplace(cell.row, cell.column);
+//      std::clog << "Possible move: " << std::tuple{cell.row, cell.column} << std::endl;
     }
   }
 
   return moves;
+}
+
+//------------------------------------------------------------------------------
+bool Board::isPossibleMove(size_t row, size_t column, Board::Cell::State player)
+{
+  bool ans = false;
+  if (row < rowCount() && column < columnCount()) {
+    ans = (Cell::State::Open == getCellState(row, column));
+  }
+
+  return ans;
 }
 
 //------------------------------------------------------------------------------
