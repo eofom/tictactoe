@@ -760,6 +760,22 @@ TEST_F(TestGameAI, testBestMove) {
     Board board = Board::Create({ {1,1}, {0,1}, {2,0}, {0,2} });
     ASSERT_EQ(ai.bestMove(board, Board::Cell::State::X), (std::tuple{0,0}));
   }
+
+  // O | _ | _
+  // _ | X | _
+  // _ | O | X
+  {
+    Board board = Board::Create({ {1,1}, {2,1}, {2,2}, {0,0} });
+    ASSERT_EQ(ai.bestMove(board, Board::Cell::State::X), (std::tuple{0,2}));
+  }
+
+  // X | O | _
+  // _ | X | _
+  // _ | _ | O
+  {
+    Board board = Board::Create({ {1,1}, {0,1}, {0,0}, {2,2} });
+    ASSERT_EQ(ai.bestMove(board, Board::Cell::State::X), (std::tuple{2,0}));
+  }
 }
 
 //------------------------------------------------------------------------------
