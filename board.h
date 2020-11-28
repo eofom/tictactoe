@@ -66,9 +66,9 @@ struct Board {
 
   bool isWinnerO();
 
-  std::set<std::tuple<size_t, size_t> > possibleMoves() const;
+  std::set<std::pair<size_t, size_t> > possibleMoves() const;
   bool isPossibleMove(size_t row, size_t column) const;
-  bool isPossibleMove(std::tuple<size_t, size_t> coordinates) const;
+  bool isPossibleMove(std::pair<size_t, size_t> coordinates) const;
 
   enum class GameState {
     Pending = 0,
@@ -91,7 +91,7 @@ struct Board {
 
 
 std::ostream & operator<<(std::ostream & os, const Board & board);
-std::ostream & operator<<(std::ostream & os, const std::tuple<size_t, size_t> & t);
+std::ostream & operator<<(std::ostream & os, const std::pair<size_t, size_t> & t);
 
 
 #endif // BOARD_H

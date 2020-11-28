@@ -106,8 +106,8 @@ bool Board::isWinnerO() {
 }
 
 //------------------------------------------------------------------------------
-std::set<std::tuple<size_t, size_t> > Board::possibleMoves() const {
-  std::set<std::tuple<size_t, size_t> > moves;
+std::set<std::pair<size_t, size_t> > Board::possibleMoves() const {
+  std::set<std::pair<size_t, size_t> > moves;
   for (const auto & cell : cells) {
     if (Cell::State::Open == cell.state) {
       moves.emplace(cell.row, cell.column);
@@ -130,7 +130,7 @@ bool Board::isPossibleMove(size_t row, size_t column) const
 }
 
 //------------------------------------------------------------------------------
-bool Board::isPossibleMove(std::tuple<size_t, size_t> coordinates) const
+bool Board::isPossibleMove(std::pair<size_t, size_t> coordinates) const
 {
   auto [row, column] = coordinates;
   return isPossibleMove(row, column);
@@ -210,10 +210,9 @@ bool operator ==(const Board::Move & lhs, const Board::Move rhs) {
       && lhs.column == rhs.column;
 }
 
-
-
-ostream &operator<<(ostream &os, const std::tuple<size_t, size_t> &t)
+//------------------------------------------------------------------------------
+ostream &operator<<(ostream &os, const std::pair<size_t, size_t> &t)
 {
   auto [row, column] = t;
-  return os << "["s << row << ","s << column << "]"s;
+  return os << "<"s << row << ","s << column << ">"s;
 }

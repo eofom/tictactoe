@@ -79,7 +79,7 @@ void Game::playHumanVsAI(Board::Cell::State human_player)
 
 //----------------------------------------------------------------------------------------
 bool Game::move(Board &board, Board::Cell::State player,
-                const std::tuple<size_t, size_t> & coordinates) {
+                const std::pair<size_t, size_t> &coordinates) {
   bool success = false;
   if (board.isPossibleMove(coordinates)) {
     auto [row, column] = coordinates;
@@ -91,8 +91,8 @@ bool Game::move(Board &board, Board::Cell::State player,
 }
 
 //----------------------------------------------------------------------------------------
-std::tuple<size_t, size_t> Game::askForMove() {
-  std::tuple<size_t, size_t> coordinates;
+std::pair<size_t, size_t> Game::askForMove() {
+  std::pair<size_t, size_t> coordinates;
   while (true) {
     size_t cell_number = 0;
     std::cout << "Make a move [1-9]: ";
@@ -115,7 +115,7 @@ std::tuple<size_t, size_t> Game::askForMove() {
 }
 
 //----------------------------------------------------------------------------------------
-std::tuple<size_t, size_t> Game::numberToCellCoordinates(size_t number) {
+std::pair<size_t, size_t> Game::numberToCellCoordinates(size_t number) {
   size_t row = (number-1) / 3;
   size_t column = (number-1) % 3;
 
@@ -125,7 +125,7 @@ std::tuple<size_t, size_t> Game::numberToCellCoordinates(size_t number) {
 //----------------------------------------------------------------------------------------
 bool Game::AI::rowHasWinnerMove(const Board &board, size_t row,
                                 Board::Cell::State player,
-                                std::tuple<size_t, size_t> & winner_move) {
+                                std::pair<size_t, size_t> & winner_move) {
   bool result = false;
   if (row < board.rowCount()) {
     bool has_enemy_cells = false;
@@ -153,7 +153,7 @@ bool Game::AI::rowHasWinnerMove(const Board &board, size_t row,
 //----------------------------------------------------------------------------------------
 bool Game::AI::columnHasWinnerMove(const Board &board, size_t column,
                                    Board::Cell::State player,
-                                   std::tuple<size_t, size_t> &winner_move) {
+                                   std::pair<size_t, size_t> &winner_move) {
   bool result = false;
   if (column < board.columnCount()) {
     bool has_enemy_cells = false;
@@ -181,7 +181,7 @@ bool Game::AI::columnHasWinnerMove(const Board &board, size_t column,
 //----------------------------------------------------------------------------------------
 bool Game::AI::leftTopDiagonalHasWinnerMove(const Board &board,
                                             Board::Cell::State player,
-                                            std::tuple<size_t, size_t> &winner_move) {
+                                            std::pair<size_t, size_t> &winner_move) {
   size_t cells_checked_by_player = 0;
   bool has_enemy_cells = false;
   for (size_t row = 0; row < board.rowCount(); ++row) {
@@ -205,7 +205,7 @@ bool Game::AI::leftTopDiagonalHasWinnerMove(const Board &board,
 //----------------------------------------------------------------------------------------
 bool Game::AI::leftBottomDiagonalHasWinnerMove(const Board &board,
                                                Board::Cell::State player,
-                                               std::tuple<size_t, size_t> &winner_move) {
+                                               std::pair<size_t, size_t> &winner_move) {
   size_t cells_checked_by_player = 0;
   bool has_enemy_cells = false;
   for (size_t column = 0; column < board.columnCount(); ++column) {
@@ -238,7 +238,7 @@ Board Game::AI::boardAfterMove(size_t row, size_t column, Board::Cell::State pla
 }
 
 //----------------------------------------------------------------------------------------
-std::tuple<size_t, size_t> Game::AI::bestMove(const Board &board,
+std::pair<size_t, size_t> Game::AI::bestMove(const Board &board,
                                               Board::Cell::State player) {
   auto winner_moves = winnerMoves(board, player);
   if (!winner_moves.empty()) {
@@ -260,7 +260,7 @@ std::tuple<size_t, size_t> Game::AI::bestMove(const Board &board,
     return(*brilliant_moves.begin());
   }
 
-  std::tuple<size_t, size_t> center_move = {1u,1u};
+  std::pair<size_t, size_t> center_move = {1u,1u};
   if (board.isPossibleMove(center_move)) {
     return center_move;
   }
@@ -276,7 +276,7 @@ std::tuple<size_t, size_t> Game::AI::bestMove(const Board &board,
    * prefer diagonal moves {2,0}, {0,2} rather than {0,0} */
 
   auto possible_moves = board.possibleMoves();
-  auto pred_diagonal_move = [&board](const std::tuple<size_t, size_t> move) {
+  auto pred_diagonal_move = [&board](const std::pair<size_t, size_t> move) {
     auto [row, column] = move;
     return row == column
         || row == board.columnCount() - 1 - column;
@@ -288,15 +288,14 @@ std::tuple<size_t, size_t> Game::AI::bestMove(const Board &board,
   }
 
   // FIXME otherwise return invalid move
-  return std::tuple{std::numeric_limits<size_t>::max(),
-                    std::numeric_limits<size_t>::max()};
+  return { std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max() };
 }
 
 //----------------------------------------------------------------------------------------
-std::set<std::tuple<size_t, size_t> > Game::AI::winnerMoves(const Board &board,
+std::set<std::pair<size_t, size_t> > Game::AI::winnerMoves(const Board &board,
                                                                Board::Cell::State player) {
-  std::set<std::tuple<size_t, size_t> > winner_moves;
-  std::tuple<size_t, size_t> cell;
+  std::set<std::pair<size_t, size_t> > winner_moves;
+  std::pair<size_t, size_t> cell;
   for (size_t row = 0; row < board.rowCount(); ++row) {
     if (rowHasWinnerMove(board, row, player, cell)) {
       winner_moves.insert(cell);
@@ -321,15 +320,15 @@ std::set<std::tuple<size_t, size_t> > Game::AI::winnerMoves(const Board &board,
 }
 
 //----------------------------------------------------------------------------------------
-std::set<std::tuple<size_t, size_t> > Game::AI::loserMoves(const Board &board,
+std::set<std::pair<size_t, size_t> > Game::AI::loserMoves(const Board &board,
                                                               Board::Cell::State player) {
   return winnerMoves(board, board.otherPlayer(player));
 }
 
 //----------------------------------------------------------------------------------------
-std::set<std::tuple<size_t, size_t> > Game::AI::movesLeadingToTwoWinOpportunities(
+std::set<std::pair<size_t, size_t> > Game::AI::movesLeadingToTwoWinOpportunities(
       const Board &board, Board::Cell::State player) {
-  std::set<std::tuple<size_t, size_t> > brilliant_moves;
+  std::set<std::pair<size_t, size_t> > brilliant_moves;
 //  std::clog << "Current board:" << std::endl << board << std::endl;
   for (const auto & move : board.possibleMoves()) {
     auto [row, column] = move;
