@@ -7,24 +7,24 @@
 
 using namespace std;
 
-enum class PlayerType {
-    USER,
-    BOT
-};
-
-enum class PlayerSymbol {
-    A = 'X',
-    B = 'O'
-};
-
 class Player {
 public:
+
+    enum class Type {
+        USER,
+        BOT
+    };
+
+    enum class Symbol {
+        A = 'X',
+        B = 'O'
+    };
 
     Player() {
         PlayerInit();
     }
 
-    Player(const PlayerType& type): type_(type) {
+    Player(const Type& type): type_(type) {
         PlayerInit();
     }
 
@@ -39,7 +39,7 @@ public:
         name_ = "Player "s + static_cast<char>('A' + !first_player_);
     }
 
-    PlayerType GetType() const {
+    Type GetType() const {
         return type_;
     }
 
@@ -48,7 +48,7 @@ public:
     }
 
     operator string() const {
-        return string(1, static_cast<char>(first_player_ ? PlayerSymbol::A : PlayerSymbol::B));
+        return string(1, static_cast<char>(first_player_ ? Symbol::A : Symbol::B));
 
     }
 
@@ -56,19 +56,18 @@ private:
     inline static int players_count_ = 0;
     bool first_player_ = true;
     string name_;
-    PlayerType type_ = PlayerType::USER;
+    Type type_ = Type::USER;
 };
 
 ostream& operator<<(ostream& out, const Player& player) {
     return out << static_cast<string>(player);
 }
 
-ostream& operator<<(ostream& out, const PlayerType& player_type) {
-    return out << (player_type == PlayerType::USER ? "USER" : "BOT");
+ostream& operator<<(ostream& out, const Player::Type& player_type) {
+    return out << (player_type == Player::Type::USER ? "USER" : "BOT");
 }
 
-class Move {
-public:
+struct Move {
     int h_index = -1;
     int v_index = -1;
 
@@ -103,7 +102,7 @@ public:
 
     Tictactoe() = default;
 
-    Tictactoe(PlayerType player_a, PlayerType player_b, int grid_size = 3, int target = 0)
+    Tictactoe(Player::Type player_a, Player::Type player_b, int grid_size = 3, int target = 0)
             : players_({player_a, player_b}),
               grid_size_(grid_size),
               target_(target ? target : grid_size) {
@@ -143,8 +142,8 @@ private:
     int moves_count_ = 0;
     int target_ = grid_size_;
     vector<vector<string>> grid_ = GetGrid();
-    vector<Player> players_ = {PlayerType::USER, PlayerType::BOT};
-    bool visible = players_[0].GetType() == PlayerType::USER || players_[1].GetType() == PlayerType::USER;
+    vector<Player> players_ = {Player::Type::USER, Player::Type::BOT};
+    bool visible_ = players_[0].GetType() == Player::Type::USER || players_[1].GetType() == Player::Type::USER;
 
     void PlayInit() {
         moves_count_ = 0;
@@ -152,7 +151,7 @@ private:
     }
 
     void Greeting() const {
-        Print("\rTic-tac-toe.\n"s);
+        Print("\rThe tic-tac-toe game has begun.\n"s);
     }
 
     bool CheckWin(const Move& lastMove) const {
@@ -171,7 +170,7 @@ private:
 
     Move GetMove() const {
         Move move;
-        if (players_[moves_count_ % 2].GetType() == PlayerType::USER) {
+        if (players_[moves_count_ % 2].GetType() == Player::Type::USER) {
             string comand;
             do {
                 if(!comand.empty()) {
@@ -257,7 +256,7 @@ private:
     }
 
     void Print(const string& str) const {
-        if (visible) {
+        if (visible_) {
             cout << str;
         }
     }
@@ -280,13 +279,14 @@ void Tests() {
 int main() {
     Tests();
 
-    Tictactoe game(PlayerType::USER, PlayerType::BOT);
+    Tictactoe game(Player::Type::USER, Player::Type::BOT);
 
     while(true) {
         cout << game.Play() << endl;
         cout << endl << "Play again? y/n: "s;
         string answer;
-        if (getline(cin, answer); answer == "n"s) {
+        getline(cin, answer);
+        if (answer == "n"s) {
             break;
         }
     }
