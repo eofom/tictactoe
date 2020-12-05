@@ -50,16 +50,18 @@ int main() {
     buddy = std::tolower(buddy);
   }
 
-  Game::Player player_x = Game::Player::Human;
-  Game::Player player_o = Game::Player::Human;
+  Game::Player::Player::PlayerType player_x = Game::Player::PlayerType::Human;
+  Game::Player::Player::PlayerType player_o = Game::Player::PlayerType::Human;
   if ('a' == buddy) {
     if ('x' == me) {
-      player_o = Game::Player::AI;
+      player_o = Game::Player::PlayerType::AI;
     } else {
-      player_x = Game::Player::AI;
+      player_x = Game::Player::PlayerType::AI;
     }
   }
 
   Game game(player_x, player_o);
   game.play();
+
+  return 0;
 }

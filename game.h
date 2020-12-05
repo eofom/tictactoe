@@ -9,20 +9,30 @@
 class Game
 {
 public:
-  enum class Player {
-    Human = 0,
-    AI
+  struct Player {
+    enum class PlayerType {
+      Human = 0,
+      AI
+    } type;
+
+    enum class Mark {
+      X = 0,
+      O
+    } mark;
+
+    explicit Player(PlayerType type, Mark mark)
+      : type(type),
+        mark(mark)
+    {}
+
+    bool operator==(const Player& other) {
+      return mark == other.mark;
+    }
   };
 
-  Game(Player x, Player o, size_t board_size = 3, size_t marks_to_win = 3);
+  Game(Player::PlayerType x, Player::PlayerType o, size_t board_size = 3, size_t marks_to_win = 3);
 
   void play();
-
-  void playHumanVsHuman();
-  void playHumanVsAI(Board::Cell::State human_player);
-
-  bool move(Board & board, Board::Cell::State player,
-            const std::pair<size_t, size_t> & coordinates);
 
   class AI {
   public:
@@ -52,11 +62,14 @@ public:
   bool isWinner(const std::pair<size_t, size_t> & last_move) const;
 
 private:
-  std::pair<size_t, size_t> askForMove();
+  const Player& otherPlayer(const Player& player);
+  std::pair<size_t, size_t> askPlayerForMove(const Player &player);
+  std::pair<size_t, size_t> askHumanForMove();
   std::pair<size_t, size_t> numberToCellCoordinates(size_t number);
 
-  Player player_x_;
-  Player player_o_;
+  static Board::Cell::State cellStateForPlayer(const Player& player);
+
+  const std::pair<Player, Player> players_;
   Board board_;
   size_t marks_to_win_;
 };

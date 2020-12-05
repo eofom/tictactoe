@@ -6,9 +6,10 @@
 using namespace std;
 
 //----------------------------------------------------------------------------------------
-Game::Game(Game::Player x, Game::Player o, size_t board_size, size_t marks_to_win)
-  : player_x_(x),
-    player_o_(o),
+Game::Game(Game::Player::PlayerType x, Game::Player::PlayerType o,
+           size_t board_size, size_t marks_to_win)
+  : players_({ Player(x, Player::Mark::X),
+               Player(o, Player::Mark::O) }),
     board_(Board(board_size)),
     marks_to_win_(marks_to_win)
 {}
@@ -17,114 +18,45 @@ Game::Game(Game::Player x, Game::Player o, size_t board_size, size_t marks_to_wi
 void Game::play()
 {
   board_.clear();
-  if (Player::AI == player_x_) {
-    playHumanVsAI(Board::Cell::State::O);
-  } else if (Player::AI == player_o_) {
-    playHumanVsAI(Board::Cell::State::X);
-  } else {
-    playHumanVsHuman();
-  }
-}
-
-//----------------------------------------------------------------------------------------
-void Game::playHumanVsHuman() {
-  Board::Cell::State player = Board::Cell::State::X;
+  Player player = players_.first;
   bool is_winner = false;
-  while ( true ) {
+  while (true) {
     std::cout << std::endl << board_ << std::endl<< std::endl;
-    auto last_move = askForMove();
+    auto last_move = askPlayerForMove(player);
     auto [row, column] = last_move;
-        board_.setCellState(row, column, player);
-
-        is_winner = isWinner(last_move);
-        if (is_winner || board_.possibleMoves().empty()) {
-      break;
-    }
-
-    player = board_.otherPlayer(player);
-  }
-  std::cout << std::endl << board_ << std::endl<< std::endl;
-
-
-  if (is_winner) {
-    switch (player) {
-    case Board::Cell::State::X:
-      std::cout << "X WINS!!!" << std::endl;
-      break;
-    case Board::Cell::State::O:
-      std::cout << "O WINS!!!" << std::endl;
-      break;
-    }
-  } else {
-    std::cout << "Draw... Try again." << std::endl;
-  }
-}
-
-//----------------------------------------------------------------------------------------
-void Game::playHumanVsAI(Board::Cell::State human_player) {
-  AI ai;
-  auto ai_player = board_.otherPlayer(human_player);
-  // X always moves first
-  if (Board::Cell::State::X == ai_player) {
-    move(board_, ai_player, ai.bestMove(board_, ai_player));
-  }
-
-  auto player = human_player;
-  bool is_winner = false;
-  while ( true ) {
-    std::cout << std::endl << board_ << std::endl<< std::endl;
-    // Human moves
-    auto last_move = askForMove();
-    auto [row, column] = last_move;
-    board_.setCellState(row, column, human_player);
+    board_.setCellState(row, column, cellStateForPlayer(player));
     is_winner = isWinner(last_move);
-    bool no_moves_left = board_.possibleMoves().empty();
-    if (is_winner || no_moves_left) {
+    if (is_winner || board_.possibleMoves().empty()) {
       break;
     }
-    player = board_.otherPlayer(player);
 
-    // AI moves
-    auto ai_last_move = ai.bestMove(board_, ai_player);
-    move(board_, ai_player, ai_last_move);
-    is_winner = isWinner(ai_last_move);
-    no_moves_left = board_.possibleMoves().empty();
-    if (is_winner || no_moves_left) {
-      break;
-    }
-    player = board_.otherPlayer(player);
+    player = otherPlayer(player);
   }
-  std::cout << std::endl << board_ << std::endl<< std::endl;
 
   if (is_winner) {
-    switch (player) {
-    case Board::Cell::State::X:
-      std::cout << "X WINS!!!" << std::endl;
+    switch (player.mark) {
+    case Player::Mark::X:
+      std::cout << "X Wins." << std::endl;
       break;
-    case Board::Cell::State::O:
-      std::cout << "O WINS!!!" << std::endl;
+    case Player::Mark::O:
+      std::cout << "O Wins." << std::endl;
       break;
     }
   } else {
-    std::cout << "Draw... Try again." << std::endl;
+    std::cout << "Draw." << std::endl;
   }
 }
 
 //----------------------------------------------------------------------------------------
-bool Game::move(Board &board, Board::Cell::State player,
-                const std::pair<size_t, size_t> &coordinates) {
-  bool success = false;
-  if (board.isPossibleMove(coordinates)) {
-    auto [row, column] = coordinates;
-    board.setCellState(row, column, player);
-    success = true;
-  }
-
-  return success;
+std::pair<size_t, size_t> Game::askPlayerForMove(const Player& player) {
+  Game::AI ai;
+  return (Player::PlayerType::Human == player.type)
+      ? askHumanForMove()
+      : ai.bestMove(board_, cellStateForPlayer(player));
 }
 
 //----------------------------------------------------------------------------------------
-std::pair<size_t, size_t> Game::askForMove() {
+std::pair<size_t, size_t> Game::askHumanForMove() {
   std::pair<size_t, size_t> coordinates;
   while (true) {
     size_t cell_number = 0;
@@ -156,6 +88,13 @@ std::pair<size_t, size_t> Game::numberToCellCoordinates(size_t number) {
 }
 
 //----------------------------------------------------------------------------------------
+Board::Cell::State Game::cellStateForPlayer(const Game::Player &player) {
+  return (player.mark == Player::Mark::X)
+      ? Board::Cell::State::X
+      : Board::Cell::State::O;
+}
+
+//----------------------------------------------------------------------------------------
 bool Game::isWinner(const std::pair<size_t, size_t> &last_move) const {
   MarksHorizontalLine horizontal(board_, last_move);
   MarksVerticalLine vertical(board_, last_move);
@@ -166,6 +105,13 @@ bool Game::isWinner(const std::pair<size_t, size_t> &last_move) const {
       || vertical.size() == marks_to_win_
       || top_diagonal.size() == marks_to_win_
       || bottom_diagonal.size() == marks_to_win_;
+}
+
+//----------------------------------------------------------------------------------------
+const Game::Player &Game::otherPlayer(const Game::Player &player) {
+  auto [x, o] = players_;
+  return (player.mark == x.mark)
+      ? players_.second : x;
 }
 
 //----------------------------------------------------------------------------------------

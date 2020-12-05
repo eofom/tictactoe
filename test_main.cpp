@@ -53,7 +53,7 @@ TEST_F(TestGameBoard, testXWinsInRow) {
     board.setCellState(0, 1, Board::Cell::State::X);
     board.setCellState(0, 2, Board::Cell::State::X);
 
-    Game game(Game::Player::Human, Game::Player::Human, 3, 3);
+    Game game(Game::Player::PlayerType::Human, Game::Player::PlayerType::Human, 3, 3);
     ASSERT_TRUE(game.isWinner({2,2}));
   }
 }
@@ -67,7 +67,7 @@ TEST_F(TestGameBoard, testXWinsInColumn) {
     board.setCellState(1, 0, Board::Cell::State::X);
     board.setCellState(2, 0, Board::Cell::State::X);
 
-    Game game(Game::Player::Human, Game::Player::Human, 3, 3);
+    Game game(Game::Player::PlayerType::Human, Game::Player::PlayerType::Human, 3, 3);
     ASSERT_TRUE(game.isWinner({1,0}));
   }
 }
@@ -79,7 +79,7 @@ TEST_F(TestGameBoard, testXWinsTopDiag) {
   board.setCellState(1, 1, Board::Cell::State::X);
   board.setCellState(2, 2, Board::Cell::State::X);
 
-  Game game(Game::Player::Human, Game::Player::Human, 3, 3);
+  Game game(Game::Player::PlayerType::Human, Game::Player::PlayerType::Human, 3, 3);
   ASSERT_TRUE(game.isWinner({1,1}));
 }
 
@@ -90,7 +90,7 @@ TEST_F(TestGameBoard, testXWinsBottomDiag) {
   board.setCellState(1, 1, Board::Cell::State::X);
   board.setCellState(0, 2, Board::Cell::State::X);
 
-  Game game(Game::Player::Human, Game::Player::Human, 3, 3);
+  Game game(Game::Player::PlayerType::Human, Game::Player::PlayerType::Human, 3, 3);
   ASSERT_TRUE(game.isWinner({1,1}));
 }
 
