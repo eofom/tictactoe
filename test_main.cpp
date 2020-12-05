@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 
 #include "board.h"
+#include "marksline.h"
 #include "game.h"
-using namespace std;
 
+using namespace std;
 
 //------------------------------------------------------------------------------
 class TestGameBoard : public ::testing::Test {
@@ -783,10 +784,134 @@ TEST_F(TestGameAI, testBestMove) {
 }
 
 //------------------------------------------------------------------------------
+class TestBoardLines : public ::testing::Test {
+protected:
+        void SetUp()
+        { }
+};
+
 //------------------------------------------------------------------------------
+TEST_F(TestBoardLines, testMarksHorizontalLine) {
+  {
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::X);
+    board.setCellState(0, 1, Board::Cell::State::X);
+    board.setCellState(0, 2, Board::Cell::State::X);
+
+    MarksHorizontalLine hline0(board, {0, 0});
+    ASSERT_EQ(3u, hline0.size());
+    MarksHorizontalLine hline1(board, {0, 1});
+    ASSERT_EQ(3u, hline1.size());
+    MarksHorizontalLine hline2(board, {0, 2});
+    ASSERT_EQ(3u, hline2.size());
+  }
+
+  {
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::O);
+    board.setCellState(0, 1, Board::Cell::State::O);
+    board.setCellState(0, 2, Board::Cell::State::X);
+
+    MarksHorizontalLine hline0(board, {0, 0});
+    ASSERT_EQ(2u, hline0.size());
+    MarksHorizontalLine hline2(board, {0, 2});
+    ASSERT_EQ(1u, hline2.size());
+  }
+
+  {
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::O);
+    board.setCellState(0, 1, Board::Cell::State::O);
+    board.setCellState(0, 2, Board::Cell::State::X);
+
+    MarksHorizontalLine hline0(board, {0, 0});
+    ASSERT_EQ(2u, hline0.size());
+    MarksHorizontalLine hline2(board, {0, 2});
+    ASSERT_EQ(1u, hline2.size());
+  }
+
+  {
+    Board board;
+
+    MarksHorizontalLine hline0(board, {0, 0});
+    // TODO Count player marks only
+//    ASSERT_EQ(0, hline0.size());
+  }
+
+
+}
+
 //------------------------------------------------------------------------------
+TEST_F(TestBoardLines, testMarksVerticalLine) {
+  {
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::X);
+    board.setCellState(1, 0, Board::Cell::State::X);
+    board.setCellState(2, 0, Board::Cell::State::X);
+
+    MarksVerticalLine vline0(board, {0,0});
+    ASSERT_EQ(3u, vline0.size());
+    MarksVerticalLine vline1(board, {1,0});
+    ASSERT_EQ(3u, vline1.size());
+    MarksVerticalLine vline2(board, {2,0});
+    ASSERT_EQ(3u, vline2.size());
+  }
+
+  {
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::O);
+    board.setCellState(1, 0, Board::Cell::State::O);
+    board.setCellState(2, 0, Board::Cell::State::X);
+
+    MarksVerticalLine vline0(board, {0,0});
+    ASSERT_EQ(2u, vline0.size());
+    MarksVerticalLine vline2(board, {2,0});
+    ASSERT_EQ(1u, vline2.size());
+  }
+
+  {
+    Board board;
+
+    MarksVerticalLine vline0(board, {0,0});
+    // TODO Count player marks only
+//    ASSERT_EQ(0, vline0.size());
+  }
+}
+
 //------------------------------------------------------------------------------
+TEST_F(TestBoardLines, testMarksLeftTopDiagonal) {
+  {
+    Board board;
+    board.setCellState(0, 0, Board::Cell::State::O);
+    board.setCellState(1, 1, Board::Cell::State::O);
+    board.setCellState(2, 2, Board::Cell::State::X);
+
+    MarksLeftTopDiagonal diag0(board, {0,0});
+    ASSERT_EQ(2u, diag0.size());
+    MarksLeftTopDiagonal diag1(board, {1,1});
+    ASSERT_EQ(2u, diag1.size());
+    MarksLeftTopDiagonal diag2(board, {2,2});
+    ASSERT_EQ(1u, diag2.size());
+  }
+}
+
 //------------------------------------------------------------------------------
+TEST_F(TestBoardLines, testMarksLeftBottomDiagonal) {
+  {
+    Board board;
+    board.setCellState(2, 0, Board::Cell::State::O);
+    board.setCellState(1, 1, Board::Cell::State::O);
+    board.setCellState(0, 2, Board::Cell::State::X);
+
+    MarksLeftBottomDiagonal diag0(board, {2,0});
+    ASSERT_EQ(2u, diag0.size());
+    MarksLeftBottomDiagonal diag1(board, {1,1});
+    ASSERT_EQ(2u, diag1.size());
+    MarksLeftBottomDiagonal diag2(board, {0,2});
+    ASSERT_EQ(1u, diag2.size());
+  }
+}
+
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
