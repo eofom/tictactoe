@@ -6,9 +6,6 @@
 #include <set>
 #include <tuple>
 
-static const size_t BOARD_ROW_COUNT = 3;
-static const size_t BOARD_COLUMN_COUNT = 3;
-
 struct Board {
   struct Move {
     Move(size_t row, size_t column)

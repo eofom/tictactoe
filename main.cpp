@@ -60,7 +60,21 @@ int main() {
     }
   }
 
-  Game game(player_x, player_o);
+  size_t board_size = 0;
+  while (board_size < 3) {
+    std::cout << "Enter square board size N(min=3) = ";
+    std::cin >> board_size;
+  }
+  std::cout << std::endl;
+
+  size_t marks_to_win = 0;
+  while (marks_to_win < 3 || board_size < marks_to_win) {
+    std::cout << "How many marks in a row to win? ";
+    std::cin >> marks_to_win;
+  }
+  std::cout << std::endl;
+
+  Game game(player_x, player_o, board_size, marks_to_win);
   game.play();
 
   return 0;

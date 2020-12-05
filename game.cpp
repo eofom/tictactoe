@@ -33,6 +33,7 @@ void Game::play()
     player = otherPlayer(player);
   }
 
+  std::cout << std::endl << board_ << std::endl<< std::endl;
   if (is_winner) {
     switch (player.mark) {
     case Player::Mark::X:
@@ -69,10 +70,10 @@ std::pair<size_t, size_t> Game::askHumanForMove() {
         coordinates = { row, column };
         break;
       } else {
-        std::cerr << "Cell " << cell_number << " is occupied" << std::endl;
+        std::cerr << "Cell " << cell_number << coordinates << " is occupied" << std::endl;
       }
     } else {
-      std::cerr << "Cell " << cell_number << " is out of range (must be 1-9)" << std::endl;
+      std::cerr << "Cell " << cell_number << coordinates << " is out of range " << std::endl;
     }
   }
 
@@ -81,8 +82,8 @@ std::pair<size_t, size_t> Game::askHumanForMove() {
 
 //----------------------------------------------------------------------------------------
 std::pair<size_t, size_t> Game::numberToCellCoordinates(size_t number) {
-  size_t row = (number-1) / 3;
-  size_t column = (number-1) % 3;
+  size_t row = number / board_.columnCount();
+  size_t column = number % board_.rowCount();
 
   return { row, column };
 }

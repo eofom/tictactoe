@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -108,33 +109,37 @@ Board Board::Create(size_t board_size, const std::vector<Move> &moves) {
 }
 
 //------------------------------------------------------------------------------
-std::ostream & operator<<(std::ostream & os, const Board::Cell & cell) {
-  char repr = ' ';
-  switch (cell.state) {
-  case Board::Cell::State::O:
-    os << 'O';
-    break;
-  case Board::Cell::State::X:
-    os << 'X';
-    break;
-  case Board::Cell::State::Open:
-    os << (cell.row * BOARD_COLUMN_COUNT + cell.column + 1);
-    break;
+std::ostream & operator<<(std::ostream & os, const Board & board) {
+  for (size_t row = 0; row < board.rowCount(); ++row) {
+    for (size_t column = 0; column < board.columnCount(); ++column) {
+      os << "|" << setw(5);
+      size_t cell_idx = board.columnCount() * row + column;
+      const Board::Cell & cell = board.cells.at(cell_idx);
+      switch (cell.state) {
+      case Board::Cell::State::X:
+        os << 'X';
+        break;
+      case Board::Cell::State::O:
+        os << 'O';
+        break;
+      case Board::Cell::State::Open:
+        os << cell_idx;
+        break;
+
+      }
+    }
+    os << "\n";
   }
 
-  return os << repr;
-}
+  return os << std::endl;
+//    os << board.cells.at(0) << " | "s << board.cells.at(1) << " | "s << board.cells.at(2)
+//       << std::endl << std::string(13, '-') << std::endl
+//       << board.cells.at(3) << " | "s << board.cells.at(4) << " | "s << board.cells.at(5)
+//       << std::endl << std::string(13, '-') << std::endl
+//       << board.cells.at(6) << " | "s << board.cells.at(7) << " | "s << board.cells.at(8)
+//       << std::endl << std::string(13, '-') << std::endl;
 
-//------------------------------------------------------------------------------
-std::ostream & operator<<(std::ostream & os, const Board & board) {
-    os << board.cells.at(0) << " | "s << board.cells.at(1) << " | "s << board.cells.at(2)
-       << std::endl << std::string(13, '-') << std::endl
-       << board.cells.at(3) << " | "s << board.cells.at(4) << " | "s << board.cells.at(5)
-       << std::endl << std::string(13, '-') << std::endl
-       << board.cells.at(6) << " | "s << board.cells.at(7) << " | "s << board.cells.at(8)
-       << std::endl << std::string(13, '-') << std::endl;
-
-    return os;
+//    return os;
 }
 
 //------------------------------------------------------------------------------
