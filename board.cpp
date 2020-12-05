@@ -6,13 +6,24 @@
 using namespace std;
 
 //------------------------------------------------------------------------------
-Board::Board()
+Board::Board(size_t size)
+  : size(size)
 {
   for (size_t row = 0; row < rowCount(); ++row) {
     for (size_t column = 0; column < columnCount(); ++column) {
       cells.push_back(Cell(row, column));
     }
   }
+}
+
+//------------------------------------------------------------------------------
+size_t Board::rowCount() const {
+  return size;
+}
+
+//------------------------------------------------------------------------------
+size_t Board::columnCount() const {
+  return size;
 }
 
 //------------------------------------------------------------------------------
@@ -163,8 +174,8 @@ void Board::clear()
 }
 
 //------------------------------------------------------------------------------
-Board Board::Create(const std::vector<Move> &moves) {
-  Board board;
+Board Board::Create(size_t board_size, const std::vector<Move> &moves) {
+  Board board(board_size);
   Cell::State player = Cell::State::X;
   for (const Move & move : moves) {
     board.setCellState(move.row, move.column, player);

@@ -6,9 +6,11 @@
 using namespace std;
 
 //----------------------------------------------------------------------------------------
-Game::Game(Game::Player x, Game::Player o)
+Game::Game(Game::Player x, Game::Player o, size_t board_size, size_t marks_to_win)
   : player_x_(x),
-    player_o_(o)
+    player_o_(o),
+    board_(Board(board_size)),
+    marks_to_win_(marks_to_win)
 {}
 
 //----------------------------------------------------------------------------------------
@@ -120,6 +122,22 @@ std::pair<size_t, size_t> Game::numberToCellCoordinates(size_t number) {
   size_t column = (number-1) % 3;
 
   return { row, column };
+}
+
+//----------------------------------------------------------------------------------------
+bool Game::isWinner(const std::pair<size_t, size_t> &last_move) const {
+  // FIXME
+  MarksHorizontalLine hline(board_, last_move);
+}
+
+size_t Game::marksToWin() const
+{
+  return marks_to_win_;
+}
+
+void Game::setMarksToWin(size_t &marks_to_win)
+{
+  marks_to_win_ = marks_to_win;
 }
 
 //----------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ protected:
 
 //------------------------------------------------------------------------------
 TEST_F(TestGameBoard, testCreateEmptyBoard) {
-  Board board;
+  Board board(3);
   for (size_t row = 0; row < 3; ++row) {
     for (size_t column = 0; column < 3; ++column) {
       ASSERT_EQ(board.getCellState(row, column), Board::Cell::State::Open);
@@ -30,7 +30,7 @@ TEST_F(TestGameBoard, testCreateEmptyBoard) {
 
 //------------------------------------------------------------------------------
 TEST_F(TestGameBoard, testCreateBoardFromMoves) {
-  Board board = Board::Create( { {0,0},{2,0},{1,1},{2,1},{2,2} } );
+  Board board = Board::Create(3, { {0,0},{2,0},{1,1},{2,1},{2,2} } );
   ASSERT_EQ(board.getCellState(0,0), Board::Cell::State::X);
   ASSERT_EQ(board.getCellState(0,1), Board::Cell::State::Open);
   ASSERT_EQ(board.getCellState(0,2), Board::Cell::State::Open);
@@ -48,7 +48,7 @@ TEST_F(TestGameBoard, testCreateBoardFromMoves) {
 TEST_F(TestGameBoard, testXWinsInRow) {
   // Win by top row
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(0, 1, Board::Cell::State::X);
     board.setCellState(0, 2, Board::Cell::State::X);
@@ -59,7 +59,7 @@ TEST_F(TestGameBoard, testXWinsInRow) {
 
   // Win by middle row
   {
-    Board board;
+    Board board(3);
     board.setCellState(1, 0, Board::Cell::State::X);
     board.setCellState(1, 1, Board::Cell::State::X);
     board.setCellState(1, 2, Board::Cell::State::X);
@@ -70,7 +70,7 @@ TEST_F(TestGameBoard, testXWinsInRow) {
 
   // Win by bottom row
   {
-    Board board;
+    Board board(3);
     board.setCellState(2, 0, Board::Cell::State::X);
     board.setCellState(2, 1, Board::Cell::State::X);
     board.setCellState(2, 2, Board::Cell::State::X);
@@ -84,7 +84,7 @@ TEST_F(TestGameBoard, testXWinsInRow) {
 TEST_F(TestGameBoard, testXWinsInColumn) {
   // Win in left column
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(1, 0, Board::Cell::State::X);
     board.setCellState(2, 0, Board::Cell::State::X);
@@ -95,7 +95,7 @@ TEST_F(TestGameBoard, testXWinsInColumn) {
 
   // Win in middle column
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 1, Board::Cell::State::X);
     board.setCellState(1, 1, Board::Cell::State::X);
     board.setCellState(2, 1, Board::Cell::State::X);
@@ -106,7 +106,7 @@ TEST_F(TestGameBoard, testXWinsInColumn) {
 
   // Win in right column
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 2, Board::Cell::State::X);
     board.setCellState(1, 2, Board::Cell::State::X);
     board.setCellState(2, 2, Board::Cell::State::X);
@@ -118,7 +118,7 @@ TEST_F(TestGameBoard, testXWinsInColumn) {
 
 //------------------------------------------------------------------------------
 TEST_F(TestGameBoard, testXWinsTopDiag) {
-  Board board;
+  Board board(3);
   board.setCellState(0, 0, Board::Cell::State::X);
   board.setCellState(1, 1, Board::Cell::State::X);
   board.setCellState(2, 2, Board::Cell::State::X);
@@ -129,7 +129,7 @@ TEST_F(TestGameBoard, testXWinsTopDiag) {
 
 //------------------------------------------------------------------------------
 TEST_F(TestGameBoard, testXWinsBottomDiag) {
-  Board board;
+  Board board(3);
   board.setCellState(2, 0, Board::Cell::State::X);
   board.setCellState(1, 1, Board::Cell::State::X);
   board.setCellState(0, 2, Board::Cell::State::X);
@@ -140,13 +140,13 @@ TEST_F(TestGameBoard, testXWinsBottomDiag) {
 
 //------------------------------------------------------------------------------
 TEST_F(TestGameBoard, testDraw) {
-  Board board = Board::Create({{0,0},{1,1},{2,0},{1,0},{1,2},{2,1},{0,1},{0,2},{2,2}});
+  Board board = Board::Create(3, {{0,0},{1,1},{2,0},{1,0},{1,2},{2,1},{0,1},{0,2},{2,2}});
   ASSERT_TRUE(board.possibleMoves().empty());
 }
 
 //------------------------------------------------------------------------------
 TEST_F(TestGameBoard, testPending) {
-  Board board = Board::Create({{0,0},{1,1}});
+  Board board = Board::Create(3, {{0,0},{1,1}});
   ASSERT_EQ(7u, board.possibleMoves().size());
 }
 
@@ -162,7 +162,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
 
   // X | _ | _
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(0, 1, Board::Cell::State::Open);
     board.setCellState(0, 2, Board::Cell::State::Open);
@@ -173,7 +173,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
 
   // X | X | _
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(0, 1, Board::Cell::State::X);
     board.setCellState(0, 2, Board::Cell::State::Open);
@@ -187,7 +187,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
 
   // X | _ | X
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(0, 1, Board::Cell::State::Open);
     board.setCellState(0, 2, Board::Cell::State::X);
@@ -201,7 +201,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
 
   // _ | X | X
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::Open);
     board.setCellState(0, 1, Board::Cell::State::X);
     board.setCellState(0, 2, Board::Cell::State::X);
@@ -215,7 +215,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
 
     // X | X | O
     {
-      Board board;
+      Board board(3);
       board.setCellState(0, 0, Board::Cell::State::X);
       board.setCellState(0, 1, Board::Cell::State::X);
       board.setCellState(0, 2, Board::Cell::State::O);
@@ -226,7 +226,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
 
     // X | O | X
     {
-      Board board;
+      Board board(3);
       board.setCellState(0, 0, Board::Cell::State::X);
       board.setCellState(0, 1, Board::Cell::State::O);
       board.setCellState(0, 2, Board::Cell::State::X);
@@ -237,7 +237,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
 
     // O | X | X
     {
-      Board board;
+      Board board(3);
       board.setCellState(0, 0, Board::Cell::State::O);
       board.setCellState(0, 1, Board::Cell::State::X);
       board.setCellState(0, 2, Board::Cell::State::X);
@@ -248,7 +248,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
 
   // X | O | _
   {
-    Board board = Board::Create({ {0,0}, {0,1} });
+    Board board = Board::Create(3, { {0,0}, {0,1} });
     std::pair<size_t, size_t> move;
     ASSERT_FALSE(ai.rowHasWinnerMove(board, 0, Board::Cell::State::X, move));
     ASSERT_FALSE(ai.rowHasWinnerMove(board, 0, Board::Cell::State::O, move));
@@ -256,7 +256,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
 
   // X | _ | _
   {
-    Board board = Board::Create({ {0,0} });
+    Board board = Board::Create(3, { {0,0} });
     std::pair<size_t, size_t> move;
     ASSERT_FALSE(ai.rowHasWinnerMove(board, 0, Board::Cell::State::X, move));
     ASSERT_FALSE(ai.rowHasWinnerMove(board, 0, Board::Cell::State::O, move));
@@ -265,7 +265,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
   // _ | _ | _
   {
     // TODO
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::Open);
     board.setCellState(0, 1, Board::Cell::State::Open);
     board.setCellState(0, 2, Board::Cell::State::Open);
@@ -277,7 +277,7 @@ TEST_F(TestGameAI, testRowHasWinnerMove) {
   // X | X | X
   {
     // TODO
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(0, 1, Board::Cell::State::X);
     board.setCellState(0, 2, Board::Cell::State::X);
@@ -295,7 +295,7 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
   // _
   // _
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(1, 0, Board::Cell::State::Open);
     board.setCellState(2, 0, Board::Cell::State::Open);
@@ -308,7 +308,7 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
   // X
   // _
   {
-    Board board = Board::Create({ {0,0}, {0,1}, {1,0} });
+    Board board = Board::Create(3, { {0,0}, {0,1}, {1,0} });
     std::pair<size_t, size_t> move;
     ASSERT_TRUE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::X, move));
     ASSERT_FALSE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::O, move));
@@ -322,7 +322,7 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
     // X
     {
       // TODO
-      Board board;
+      Board board(3);
       board.setCellState(0, 0, Board::Cell::State::X);
       board.setCellState(1, 0, Board::Cell::State::Open);
       board.setCellState(2, 0, Board::Cell::State::X);
@@ -339,7 +339,7 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
     // X
     {
       // TODO
-      Board board;
+      Board board(3);
       board.setCellState(0, 0, Board::Cell::State::Open);
       board.setCellState(1, 0, Board::Cell::State::X);
       board.setCellState(2, 0, Board::Cell::State::X);
@@ -356,7 +356,7 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
     // O
     {
       // TODO
-      Board board;
+      Board board(3);
       board.setCellState(0, 0, Board::Cell::State::X);
       board.setCellState(1, 0, Board::Cell::State::X);
       board.setCellState(2, 0, Board::Cell::State::O);
@@ -370,7 +370,7 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
     // X
     {
       // TODO
-      Board board;
+      Board board(3);
       board.setCellState(0, 0, Board::Cell::State::X);
       board.setCellState(1, 0, Board::Cell::State::O);
       board.setCellState(2, 0, Board::Cell::State::X);
@@ -384,7 +384,7 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
     // X
     {
       // TODO
-      Board board;
+      Board board(3);
       board.setCellState(0, 0, Board::Cell::State::O);
       board.setCellState(1, 0, Board::Cell::State::X);
       board.setCellState(2, 0, Board::Cell::State::X);
@@ -397,7 +397,7 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
   // O
   // _
   {
-    Board board = Board::Create({ {0,0}, {1,0} });
+    Board board = Board::Create(3, { {0,0}, {1,0} });
     std::pair<size_t, size_t> move;
     ASSERT_FALSE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::X, move));
     ASSERT_FALSE(ai.columnHasWinnerMove(board, 0, Board::Cell::State::O, move));
@@ -407,7 +407,7 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
   // _
   // _
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::Open);
     board.setCellState(1, 0, Board::Cell::State::Open);
     board.setCellState(2, 0, Board::Cell::State::Open);
@@ -420,7 +420,7 @@ TEST_F(TestGameAI, testColumnHasWinnerMove) {
   // X
   // X
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(1, 0, Board::Cell::State::X);
     board.setCellState(2, 0, Board::Cell::State::X);
@@ -438,7 +438,7 @@ TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
   // _ | _ | _
   // _ | _ | _
   {
-    Board board;
+    Board board(3);
     board.setCellState(0,0, Board::Cell::State::Open);
     board.setCellState(1,1, Board::Cell::State::Open);
     board.setCellState(2,2, Board::Cell::State::Open);
@@ -451,7 +451,7 @@ TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
   // _ | X | _
   // _ | _ | X
   {
-    Board board;
+    Board board(3);
     board.setCellState(0,0, Board::Cell::State::X);
     board.setCellState(1,1, Board::Cell::State::X);
     board.setCellState(2,2, Board::Cell::State::X);
@@ -464,7 +464,7 @@ TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
   // _ | _ | _
   // _ | _ | _
   {
-    Board board;
+    Board board(3);
     board.setCellState(0,0, Board::Cell::State::X);
     board.setCellState(1,1, Board::Cell::State::Open);
     board.setCellState(2,2, Board::Cell::State::Open);
@@ -478,7 +478,7 @@ TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
   // _ | X | _
   // _ | _ | _
   {
-    Board board = Board::Create({ {0,0}, {0,1}, {1,1} });
+    Board board = Board::Create(3, { {0,0}, {0,1}, {1,1} });
     std::pair<size_t, size_t> move;
     ASSERT_TRUE(ai.leftTopDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
     auto [row, column] = move;
@@ -492,7 +492,7 @@ TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
     // _ | _ | X
     {
       // TODO
-      Board board;
+      Board board(3);
       board.setCellState(0,0, Board::Cell::State::X);
       board.setCellState(1,1, Board::Cell::State::Open);
       board.setCellState(2,2, Board::Cell::State::X);
@@ -509,7 +509,7 @@ TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
     // _ | _ | X
     {
       // TODO
-      Board board;
+      Board board(3);
       board.setCellState(0,0, Board::Cell::State::Open);
       board.setCellState(1,1, Board::Cell::State::X);
       board.setCellState(2,2, Board::Cell::State::X);
@@ -527,7 +527,7 @@ TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
     // _ | _ | O
     {
       // TODO
-      Board board;
+      Board board(3);
       board.setCellState(0,0, Board::Cell::State::X);
       board.setCellState(1,1, Board::Cell::State::X);
       board.setCellState(2,2, Board::Cell::State::O);
@@ -541,7 +541,7 @@ TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
     // _ | _ | X
     {
       // TODO
-      Board board;
+      Board board(3);
       board.setCellState(0,0, Board::Cell::State::X);
       board.setCellState(1,1, Board::Cell::State::O);
       board.setCellState(2,2, Board::Cell::State::X);
@@ -555,7 +555,7 @@ TEST_F(TestGameAI, testLeftTopDiagonalHasWinnerMove) {
     // _ | _ | X
     {
       // TODO
-      Board board;
+      Board board(3);
       board.setCellState(0,0, Board::Cell::State::O);
       board.setCellState(1,1, Board::Cell::State::X);
       board.setCellState(2,2, Board::Cell::State::X);
@@ -573,7 +573,7 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
   // _ | _ | _
   // _ | _ | _
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 2, Board::Cell::State::Open);
     board.setCellState(1, 1, Board::Cell::State::Open);
     board.setCellState(2, 0, Board::Cell::State::Open);
@@ -587,7 +587,7 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
   // X | _ | _
   {
     // TODO
-    Board board;
+    Board board(3);
     board.setCellState(0, 2, Board::Cell::State::X);
     board.setCellState(1, 1, Board::Cell::State::X);
     board.setCellState(2, 0, Board::Cell::State::X);
@@ -600,7 +600,7 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
   // _ | _ | _
   // _ | _ | _
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 2, Board::Cell::State::X);
     std::pair<size_t, size_t> move;
     ASSERT_FALSE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
@@ -611,7 +611,7 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
   // _ | X | _
   // _ | _ | _
   {
-    Board board = Board::Create({ {0,2}, {0,1}, {1,1} });
+    Board board = Board::Create(3, { {0,2}, {0,1}, {1,1} });
     std::pair<size_t, size_t> move;
     ASSERT_TRUE(ai.leftBottomDiagonalHasWinnerMove(board, Board::Cell::State::X, move));
     auto [ row, column ] = move;
@@ -625,7 +625,7 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
   // X | _ | _
   {
     // TODO
-    Board board;
+    Board board(3);
     board.setCellState(0, 2, Board::Cell::State::X);
     board.setCellState(1, 1, Board::Cell::State::Open);
     board.setCellState(2, 0, Board::Cell::State::X);
@@ -642,7 +642,7 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
   // X | _ | _
   {
     // TODO
-    Board board;
+    Board board(3);
     board.setCellState(0, 2, Board::Cell::State::Open);
     board.setCellState(1, 1, Board::Cell::State::X);
     board.setCellState(2, 0, Board::Cell::State::X);
@@ -659,7 +659,7 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
   // O | _ | _
   {
     // TODO
-    Board board;
+    Board board(3);
     board.setCellState(0, 2, Board::Cell::State::X);
     board.setCellState(1, 1, Board::Cell::State::X);
     board.setCellState(2, 0, Board::Cell::State::O);
@@ -673,7 +673,7 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
   // X | _ | _
   {
     // TODO
-    Board board;
+    Board board(3);
     board.setCellState(0, 2, Board::Cell::State::X);
     board.setCellState(1, 1, Board::Cell::State::O);
     board.setCellState(2, 0, Board::Cell::State::X);
@@ -687,7 +687,7 @@ TEST_F(TestGameAI, testLeftBottomDiagonalHasWinnerMove) {
   // X | _ | _
   {
     // TODO
-    Board board;
+    Board board(3);
     board.setCellState(0, 2, Board::Cell::State::O);
     board.setCellState(1, 1, Board::Cell::State::X);
     board.setCellState(2, 0, Board::Cell::State::X);
@@ -705,7 +705,7 @@ TEST_F(TestGameAI, testWinnerMoves) {
   // x | x | _
   // _ | x | _
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(1, 0, Board::Cell::State::X);
     board.setCellState(1, 1, Board::Cell::State::X);
@@ -727,7 +727,7 @@ TEST_F(TestGameAI, testMovesLeadingToTwoWinOpportunities) {
   // _ | X | _
   // X | _ | _
   {
-    Board board = Board::Create({ {1,1}, {0,1}, {2,0}, {0,2} });
+    Board board = Board::Create(3, { {1,1}, {0,1}, {2,0}, {0,2} });
 //    std::clog << board << std::endl;
     auto moves = ai.movesLeadingToTwoWinOpportunities(board, Board::Cell::State::X);
 //    std::clog << "testMovesLeadingToTwoWinOpportunities:\n"
@@ -750,7 +750,7 @@ TEST_F(TestGameAI, testBestMove) {
   // _ | X | _
   // X | _ | _
   {
-    Board board = Board::Create({ {1,1}, {0,0}, {2,0} });
+    Board board = Board::Create(3, { {1,1}, {0,0}, {2,0} });
     ASSERT_EQ(ai.bestMove(board, Board::Cell::State::O), (std::pair<size_t, size_t>{0,2u}));
   }
 
@@ -758,7 +758,7 @@ TEST_F(TestGameAI, testBestMove) {
   // _ | X | _
   // X | _ | _
   {
-    Board board = Board::Create({ {1,1}, {0,1}, {2,0}, {0,2} });
+    Board board = Board::Create(3, { {1,1}, {0,1}, {2,0}, {0,2} });
     ASSERT_EQ(ai.bestMove(board, Board::Cell::State::X), (std::pair<size_t, size_t>{0,0}));
   }
 
@@ -766,7 +766,7 @@ TEST_F(TestGameAI, testBestMove) {
   // _ | X | _
   // _ | O | X
   {
-    Board board = Board::Create({ {1,1}, {2,1}, {2,2}, {0,0} });
+    Board board = Board::Create(3, { {1,1}, {2,1}, {2,2}, {0,0} });
     ASSERT_EQ(ai.bestMove(board, Board::Cell::State::X), (std::pair<size_t, size_t>{0,2}));
   }
 
@@ -774,7 +774,7 @@ TEST_F(TestGameAI, testBestMove) {
   // _ | X | _
   // _ | _ | O
   {
-    Board board = Board::Create({ {1,1}, {0,1}, {0,0}, {2,2} });
+    Board board = Board::Create(3, { {1,1}, {0,1}, {0,0}, {2,2} });
     const std::pair<size_t, size_t> best_move = ai.bestMove(board, Board::Cell::State::X);
     bool cell10 = std::pair<size_t, size_t>{1u,0} == best_move;
     bool cell20 = std::pair<size_t, size_t>{2u,0} == best_move;
@@ -793,7 +793,7 @@ protected:
 //------------------------------------------------------------------------------
 TEST_F(TestBoardLines, testMarksHorizontalLine) {
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(0, 1, Board::Cell::State::X);
     board.setCellState(0, 2, Board::Cell::State::X);
@@ -807,7 +807,7 @@ TEST_F(TestBoardLines, testMarksHorizontalLine) {
   }
 
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::O);
     board.setCellState(0, 1, Board::Cell::State::O);
     board.setCellState(0, 2, Board::Cell::State::X);
@@ -819,7 +819,7 @@ TEST_F(TestBoardLines, testMarksHorizontalLine) {
   }
 
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::O);
     board.setCellState(0, 1, Board::Cell::State::O);
     board.setCellState(0, 2, Board::Cell::State::X);
@@ -831,7 +831,7 @@ TEST_F(TestBoardLines, testMarksHorizontalLine) {
   }
 
   {
-    Board board;
+    Board board(3);
 
     MarksHorizontalLine hline0(board, {0, 0});
     // TODO Count player marks only
@@ -844,7 +844,7 @@ TEST_F(TestBoardLines, testMarksHorizontalLine) {
 //------------------------------------------------------------------------------
 TEST_F(TestBoardLines, testMarksVerticalLine) {
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::X);
     board.setCellState(1, 0, Board::Cell::State::X);
     board.setCellState(2, 0, Board::Cell::State::X);
@@ -858,7 +858,7 @@ TEST_F(TestBoardLines, testMarksVerticalLine) {
   }
 
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::O);
     board.setCellState(1, 0, Board::Cell::State::O);
     board.setCellState(2, 0, Board::Cell::State::X);
@@ -870,7 +870,7 @@ TEST_F(TestBoardLines, testMarksVerticalLine) {
   }
 
   {
-    Board board;
+    Board board(3);
 
     MarksVerticalLine vline0(board, {0,0});
     // TODO Count player marks only
@@ -881,7 +881,7 @@ TEST_F(TestBoardLines, testMarksVerticalLine) {
 //------------------------------------------------------------------------------
 TEST_F(TestBoardLines, testMarksLeftTopDiagonal) {
   {
-    Board board;
+    Board board(3);
     board.setCellState(0, 0, Board::Cell::State::O);
     board.setCellState(1, 1, Board::Cell::State::O);
     board.setCellState(2, 2, Board::Cell::State::X);
@@ -898,7 +898,7 @@ TEST_F(TestBoardLines, testMarksLeftTopDiagonal) {
 //------------------------------------------------------------------------------
 TEST_F(TestBoardLines, testMarksLeftBottomDiagonal) {
   {
-    Board board;
+    Board board(3);
     board.setCellState(2, 0, Board::Cell::State::O);
     board.setCellState(1, 1, Board::Cell::State::O);
     board.setCellState(0, 2, Board::Cell::State::X);

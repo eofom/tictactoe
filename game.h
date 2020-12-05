@@ -4,6 +4,7 @@
 #include <tuple>
 
 #include "board.h"
+#include "marksline.h"
 
 class Game
 {
@@ -13,7 +14,7 @@ public:
     AI
   };
 
-  Game(Player x, Player o);
+  Game(Player x, Player o, size_t board_size = 3, size_t marks_to_win = 3);
 
   void play();
 
@@ -46,13 +47,18 @@ public:
                          const Board & board);
   };
 
+  size_t marksToWin() const;
+  void setMarksToWin(size_t &marks_to_win);
+
 private:
   std::pair<size_t, size_t> askForMove();
   std::pair<size_t, size_t> numberToCellCoordinates(size_t number);
+  bool isWinner(const std::pair<size_t, size_t> & last_move) const;
 
   Player player_x_;
   Player player_o_;
   Board board_;
+  size_t marks_to_win_;
 };
 
 #endif // GAME_H

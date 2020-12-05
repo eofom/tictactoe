@@ -38,15 +38,11 @@ struct Board {
     State state = State::Open;
   };
 
-  Board();
+  Board(size_t size);
 
-  size_t rowCount() const {
-    return BOARD_ROW_COUNT;
-  }
+  size_t rowCount() const;
 
-  size_t columnCount() const {
-    return BOARD_COLUMN_COUNT;
-  }
+  size_t columnCount() const;
 
   Cell::State getCellState(size_t row, size_t column) const;
 
@@ -81,12 +77,13 @@ struct Board {
 
   void clear();
 
-  static Board Create(const std::vector<Move> & moves);
+  static Board Create(size_t board_size, const std::vector<Move> & moves);
 
   static Cell::State otherPlayer(Cell::State player);
 
 
   std::vector<Cell> cells;
+  const size_t size;
 };
 
 
