@@ -53,30 +53,8 @@ TEST_F(TestGameBoard, testXWinsInRow) {
     board.setCellState(0, 1, Board::Cell::State::X);
     board.setCellState(0, 2, Board::Cell::State::X);
 
-    ASSERT_TRUE(board.isRowFilled(0, Board::Cell::State::X));
-    ASSERT_TRUE(board.isWinnerX());
-  }
-
-  // Win by middle row
-  {
-    Board board(3);
-    board.setCellState(1, 0, Board::Cell::State::X);
-    board.setCellState(1, 1, Board::Cell::State::X);
-    board.setCellState(1, 2, Board::Cell::State::X);
-
-    ASSERT_TRUE(board.isRowFilled(1, Board::Cell::State::X));
-    ASSERT_TRUE(board.isWinnerX());
-  }
-
-  // Win by bottom row
-  {
-    Board board(3);
-    board.setCellState(2, 0, Board::Cell::State::X);
-    board.setCellState(2, 1, Board::Cell::State::X);
-    board.setCellState(2, 2, Board::Cell::State::X);
-
-    ASSERT_TRUE(board.isRowFilled(2, Board::Cell::State::X));
-    ASSERT_TRUE(board.isWinnerX());
+    Game game(Game::Player::Human, Game::Player::Human, 3, 3);
+    ASSERT_TRUE(game.isWinner({2,2}));
   }
 }
 
@@ -89,30 +67,8 @@ TEST_F(TestGameBoard, testXWinsInColumn) {
     board.setCellState(1, 0, Board::Cell::State::X);
     board.setCellState(2, 0, Board::Cell::State::X);
 
-    ASSERT_TRUE(board.isColumnFilled(0, Board::Cell::State::X));
-    ASSERT_TRUE(board.isWinnerX());
-  }
-
-  // Win in middle column
-  {
-    Board board(3);
-    board.setCellState(0, 1, Board::Cell::State::X);
-    board.setCellState(1, 1, Board::Cell::State::X);
-    board.setCellState(2, 1, Board::Cell::State::X);
-
-    ASSERT_TRUE(board.isColumnFilled(1, Board::Cell::State::X));
-    ASSERT_TRUE(board.isWinnerX());
-  }
-
-  // Win in right column
-  {
-    Board board(3);
-    board.setCellState(0, 2, Board::Cell::State::X);
-    board.setCellState(1, 2, Board::Cell::State::X);
-    board.setCellState(2, 2, Board::Cell::State::X);
-
-    ASSERT_TRUE(board.isColumnFilled(2, Board::Cell::State::X));
-    ASSERT_TRUE(board.isWinnerX());
+    Game game(Game::Player::Human, Game::Player::Human, 3, 3);
+    ASSERT_TRUE(game.isWinner({1,0}));
   }
 }
 
@@ -123,8 +79,8 @@ TEST_F(TestGameBoard, testXWinsTopDiag) {
   board.setCellState(1, 1, Board::Cell::State::X);
   board.setCellState(2, 2, Board::Cell::State::X);
 
-  ASSERT_TRUE(board.isTopLeftDiagonalFilled(Board::Cell::State::X));
-  ASSERT_TRUE(board.isWinnerX());
+  Game game(Game::Player::Human, Game::Player::Human, 3, 3);
+  ASSERT_TRUE(game.isWinner({1,1}));
 }
 
 //------------------------------------------------------------------------------
@@ -134,8 +90,8 @@ TEST_F(TestGameBoard, testXWinsBottomDiag) {
   board.setCellState(1, 1, Board::Cell::State::X);
   board.setCellState(0, 2, Board::Cell::State::X);
 
-  ASSERT_TRUE(board.isBottomLeftDiagonalFilled(Board::Cell::State::X));
-  ASSERT_TRUE(board.isWinnerX());
+  Game game(Game::Player::Human, Game::Player::Human, 3, 3);
+  ASSERT_TRUE(game.isWinner({1,1}));
 }
 
 //------------------------------------------------------------------------------

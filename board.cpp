@@ -55,68 +55,6 @@ void Board::setCellState(size_t row, size_t column, Board::Cell::State state) {
 }
 
 //------------------------------------------------------------------------------
-bool Board::isRowFilled(size_t row, Board::Cell::State player) {
-  // FIXME
-  size_t start = columnCount() * row;
-  auto owned_by_player = [player](const Cell & cell) {
-    return cell.state == player;
-  };
-
-  return std::all_of(cells.begin() + start,
-                     cells.begin() + start + columnCount(),
-                     owned_by_player);
-}
-
-//------------------------------------------------------------------------------
-bool Board::isColumnFilled(size_t column, Board::Cell::State player) {
-  // FIXME
-  bool ans = true;
-  for (size_t row = 0; row < columnCount(); ++row) {
-    ans &= getCellState(row, column) == player;
-  }
-
-  return ans;
-}
-
-//------------------------------------------------------------------------------
-bool Board::isTopLeftDiagonalFilled(Board::Cell::State player) {
-  // FIXME
-  return getCellState(0,0) == player
-      && getCellState(1,1) == player
-      && getCellState(2,2) == player;
-}
-
-//------------------------------------------------------------------------------
-bool Board::isBottomLeftDiagonalFilled(Board::Cell::State player) {
-  // FIXME
-  return getCellState(0,2) == player
-      && getCellState(1,1) == player
-      && getCellState(2,0) == player;
-}
-
-//------------------------------------------------------------------------------
-bool Board::isWinner(Board::Cell::State player) {
-  return isRowFilled(0, player)
-      || isRowFilled(1, player)
-      || isRowFilled(2, player)
-      || isColumnFilled(0, player)
-      || isColumnFilled(1, player)
-      || isColumnFilled(2, player)
-      || isTopLeftDiagonalFilled(player)
-      || isBottomLeftDiagonalFilled(player);
-}
-
-//------------------------------------------------------------------------------
-bool Board::isWinnerX() {
-  return isWinner(Cell::State::X);
-}
-
-//------------------------------------------------------------------------------
-bool Board::isWinnerO() {
-  return isWinner(Cell::State::O);
-}
-
-//------------------------------------------------------------------------------
 std::set<std::pair<size_t, size_t> > Board::possibleMoves() const {
   std::set<std::pair<size_t, size_t> > moves;
   for (const auto & cell : cells) {
@@ -145,22 +83,6 @@ bool Board::isPossibleMove(std::pair<size_t, size_t> coordinates) const
 {
   auto [row, column] = coordinates;
   return isPossibleMove(row, column);
-}
-
-//------------------------------------------------------------------------------
-Board::GameState Board::checkGameState() {
-  GameState ans = GameState::Pending;
-  if (isWinnerX()) {
-    ans = GameState::winX;
-  } else if (isWinnerO()) {
-    ans = GameState::winO;
-  } else if (possibleMoves().empty()) {
-    ans = GameState::Draw;
-  } else {
-    ans = GameState::Pending;
-  }
-
-  return ans;
 }
 
 //------------------------------------------------------------------------------

@@ -41,44 +41,15 @@ struct Board {
   Board(size_t size);
 
   size_t rowCount() const;
-
   size_t columnCount() const;
-
   Cell::State getCellState(size_t row, size_t column) const;
-
   void setCellState(size_t row, size_t column, Cell::State state);
-
-  bool isRowFilled(size_t row, Cell::State player);
-
-  bool isColumnFilled(size_t column, Cell::State player);
-
-  bool isTopLeftDiagonalFilled(Cell::State player);
-
-  bool isBottomLeftDiagonalFilled(Cell::State player);
-
-  bool isWinner(Cell::State player);
-
-  bool isWinnerX();
-
-  bool isWinnerO();
-
   std::set<std::pair<size_t, size_t> > possibleMoves() const;
   bool isPossibleMove(size_t row, size_t column) const;
   bool isPossibleMove(std::pair<size_t, size_t> coordinates) const;
-
-  enum class GameState {
-    Pending = 0,
-    winX,
-    winO,
-    Draw
-  };
-
-  GameState checkGameState();
-
   void clear();
 
   static Board Create(size_t board_size, const std::vector<Move> & moves);
-
   static Cell::State otherPlayer(Cell::State player);
 
 

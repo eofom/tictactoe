@@ -49,11 +49,11 @@ public:
 
   size_t marksToWin() const;
   void setMarksToWin(size_t &marks_to_win);
+  bool isWinner(const std::pair<size_t, size_t> & last_move) const;
 
 private:
   std::pair<size_t, size_t> askForMove();
   std::pair<size_t, size_t> numberToCellCoordinates(size_t number);
-  bool isWinner(const std::pair<size_t, size_t> & last_move) const;
 
   Player player_x_;
   Player player_o_;
