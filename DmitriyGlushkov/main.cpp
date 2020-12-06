@@ -242,7 +242,7 @@ ostream& operator<<(ostream& out, const Move& move) {
 class IInterface {
 public:
     virtual void SetVisible(bool) = 0;
-    virtual void PrintGrid(vector<vector<string>>) const = 0;
+    virtual void PrintGrid(const vector<vector<string>>&) const = 0;
     virtual void Print(const string&) const = 0;
     virtual void GetLine(string&) const = 0;
 
@@ -259,7 +259,7 @@ public:
         getline(cin, comand);
     }
 
-    void PrintGrid(vector<vector<string>> grid) const {
+    void PrintGrid(const vector<vector<string>>& grid) const {
         Print("\n"s);
         for (int i = 0; i < grid.size(); ++ i) {
             PrintRowAndVerticalMarks(grid, i);
