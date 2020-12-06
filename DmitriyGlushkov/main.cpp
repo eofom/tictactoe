@@ -4,6 +4,7 @@
 #include <vector>
 #include <random>
 #include <chrono>
+#include <memory>
 using namespace std;
 
 class RandomizedBinarySearchTree {
@@ -45,7 +46,6 @@ public:
 
     void Clear() {
         Clear(root_);
-        root_ = 0;
     }
 
 private:
@@ -150,7 +150,11 @@ private:
         if (!p) return;
         if (p->left) Clear(p->left);
         if (p->right) Clear(p->right);
-        delete p;
+        if (p != root_) {
+            delete p;
+        } else {
+            root_ =0;
+        }
     }
 };
 
@@ -164,22 +168,16 @@ void PrintTree(RandomizedBinarySearchTree::Node* p, bool is_root = true) {
 
 class Player {
 public:
-    inline static const int kIndexPlayerFirst = -1;
-    inline static const int kIndexPlayerSecond = 1;
-    inline static const int kIndexPlayerNone = 0;
-
     enum class Type {
         USER,
         BOT,
         SMART_BOT
     };
 
-    explicit Player(const string& name, const string& simbol)
+    explicit Player(const string& name, const string& simbol, int index)
         : name_(name),
-        simbol_(simbol) {
-        assert(kIndexPlayerNone == 0);
-        assert(kIndexPlayerFirst + kIndexPlayerSecond == kIndexPlayerNone);
-        assert(kIndexPlayerFirst * kIndexPlayerSecond != kIndexPlayerNone);
+        simbol_(simbol),
+        index_(index) {
     }
 
     string GetName() const {
@@ -188,10 +186,6 @@ public:
 
     string GetSimbol() const {
         return simbol_;
-    }
-
-    void SetIndex(int index) {
-        index_ = index;
     }
 
     int GetIndex() const {
@@ -321,15 +315,12 @@ public:
               interface(new ConsolInterface()),
               index_valid_moves_(RandomizedBinarySearchTree(chrono::system_clock::now().time_since_epoch().count())) {
         interface->SetVisible(player_type_a == Player::Type::USER || player_type_b == Player::Type::USER);
+        assert(kIndexPlayerNone == 0);
+        assert(kIndexPlayerFirst + kIndexPlayerSecond == kIndexPlayerNone);
+        assert(kIndexPlayerFirst * kIndexPlayerSecond != kIndexPlayerNone);
     }
 
-    ~Tictactoe() {
-       delete interface;
-    }
-
-    string Play(const Player& player_a, const Player& player_b) {
-        players_.emplace_back(player_a);
-        players_.emplace_back(player_b);
+    string Play() {
         PlayInit();
         Greeting();
         for (int i = 0; i < grid_size_ * grid_size_; ++i) {
@@ -344,8 +335,6 @@ public:
     }
 
     string Play(vector<vector<int>> moves)  {
-        players_.emplace_back(Player("A"s, "X"));
-        players_.emplace_back(Player("B"s, "O"));
         PlayInit();
         for (int i = 0; i < moves.size(); ++i) {
             Move move = {moves[i][1], moves[i][0]};
@@ -359,6 +348,10 @@ public:
         return moves.size() < grid_size_*grid_size_ ? "Pending"s : "Draw"s;
     }
 
+    void SwapPlayers() {
+        iter_swap(players_type_.begin(), players_type_.begin() + 1);
+    }
+
 private:
     int grid_size_ = 3;
     int moves_count_ = 0;
@@ -368,18 +361,22 @@ private:
     vector<vector<string>> grid_wiev_;
     vector<Player::Type> players_type_;
     RandomizedBinarySearchTree index_valid_moves_;
+    shared_ptr<IInterface> interface;
+
+    inline static const int kIndexPlayerFirst = -1;
+    inline static const int kIndexPlayerSecond = 1;
+    inline static const int kIndexPlayerNone = 0;
     inline static const string kSimbolPlayerNone = " "s;
-    IInterface* interface;
 
     void PlayInit() {
         moves_count_ = 0;
         SetGrid();
         SetValidMovs();
-        SetPlaerIndex();
+        PlaerInit();
     }
 
     void SetGrid() {
-        grid_ = vector<vector<int>>(grid_size_, vector<int>(grid_size_, Player::kIndexPlayerNone));
+        grid_ = vector<vector<int>>(grid_size_, vector<int>(grid_size_, kIndexPlayerNone));
         grid_wiev_ = vector<vector<string>>(grid_size_, vector<string>(grid_size_, kSimbolPlayerNone));
     }
 
@@ -387,18 +384,16 @@ private:
         index_valid_moves_.Clear();
         for (int i = 0; i < grid_size_; ++i) {
             for (int j = 0; j < grid_size_; ++j) {
-                if (grid_[i][j] == Player::kIndexPlayerNone) {
+                if (grid_[i][j] == kIndexPlayerNone) {
                     index_valid_moves_.Insert(grid_size_ * i + j);
                 }
             }
         }
     }
 
-    void SetPlaerIndex() {
-        if (players_.size()) {
-            players_[0].SetIndex(Player::kIndexPlayerFirst);
-            players_[1].SetIndex(Player::kIndexPlayerSecond);
-        }
+    void PlaerInit() {
+        players_.emplace_back(Player("Player A"s, "X", kIndexPlayerFirst));
+        players_.emplace_back(Player("Player B"s, "O", kIndexPlayerSecond));
     }
 
     void Greeting() const {
@@ -543,7 +538,7 @@ int main() {
     Tictactoe game(Player::Type::USER, Player::Type::BOT);
 
     while (true) {
-        cout << game.Play(Player("Player A"s, "X"s), Player("Player B"s, "O"s)) << endl;
+        cout << game.Play() << endl;
         cout << endl << "Play again? y/n: "s;
         string answer;
         getline(cin, answer);
