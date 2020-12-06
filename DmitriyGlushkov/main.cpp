@@ -312,25 +312,25 @@ public:
             : grid_size_(grid_size),
               target_(target ? target : grid_size),
               players_type_({player_type_a, player_type_b}),
-              interface(new ConsolInterface()),
+              interface_(new ConsolInterface()),
               index_valid_moves_(RandomizedBinarySearchTree(chrono::system_clock::now().time_since_epoch().count())) {
-        interface->SetVisible(player_type_a == Player::Type::USER || player_type_b == Player::Type::USER);
-        assert(kIndexPlayerNone == 0);
-        assert(kIndexPlayerFirst + kIndexPlayerSecond == kIndexPlayerNone);
-        assert(kIndexPlayerFirst * kIndexPlayerSecond != kIndexPlayerNone);
+        interface_->SetVisible(player_type_a == Player::Type::USER || player_type_b == Player::Type::USER);
+        assert(kIndexPlayerNone_ == 0);
+        assert(kIndexPlayerFirst_ + kIndexPlayerSecond_ == kIndexPlayerNone_);
+        assert(kIndexPlayerFirst_ * kIndexPlayerSecond_ != kIndexPlayerNone_);
     }
 
     string Play() {
         PlayInit();
         Greeting();
         for (int i = 0; i < grid_size_ * grid_size_; ++i) {
-            interface->PrintGrid(grid_wiev_);
+            interface_->PrintGrid(grid_wiev_);
             if (CheckWin(DoMove(GetMove()))){
-                interface->PrintGrid(grid_wiev_);
+                interface_->PrintGrid(grid_wiev_);
                 return GetPrevPlayer().GetName() + " is win!"s;
             }
         }
-        interface->PrintGrid(grid_wiev_);
+        interface_->PrintGrid(grid_wiev_);
         return "Draw"s;
     }
 
@@ -361,12 +361,12 @@ private:
     vector<vector<string>> grid_wiev_;
     vector<Player::Type> players_type_;
     RandomizedBinarySearchTree index_valid_moves_;
-    shared_ptr<IInterface> interface;
+    shared_ptr<IInterface> interface_;
 
-    inline static const int kIndexPlayerFirst = -1;
-    inline static const int kIndexPlayerSecond = 1;
-    inline static const int kIndexPlayerNone = 0;
-    inline static const string kSimbolPlayerNone = " "s;
+    inline static const int kIndexPlayerFirst_ = -1;
+    inline static const int kIndexPlayerSecond_ = 1;
+    inline static const int kIndexPlayerNone_ = 0;
+    inline static const string kSimbolPlayerNone_ = " "s;
 
     void PlayInit() {
         moves_count_ = 0;
@@ -376,15 +376,15 @@ private:
     }
 
     void SetGrid() {
-        grid_ = vector<vector<int>>(grid_size_, vector<int>(grid_size_, kIndexPlayerNone));
-        grid_wiev_ = vector<vector<string>>(grid_size_, vector<string>(grid_size_, kSimbolPlayerNone));
+        grid_ = vector<vector<int>>(grid_size_, vector<int>(grid_size_, kIndexPlayerNone_));
+        grid_wiev_ = vector<vector<string>>(grid_size_, vector<string>(grid_size_, kSimbolPlayerNone_));
     }
 
     void SetValidMovs() {
         index_valid_moves_.Clear();
         for (int i = 0; i < grid_size_; ++i) {
             for (int j = 0; j < grid_size_; ++j) {
-                if (grid_[i][j] == kIndexPlayerNone) {
+                if (grid_[i][j] == kIndexPlayerNone_) {
                     index_valid_moves_.Insert(grid_size_ * i + j);
                 }
             }
@@ -392,12 +392,12 @@ private:
     }
 
     void PlaerInit() {
-        players_.emplace_back(Player("Player A"s, "X", kIndexPlayerFirst));
-        players_.emplace_back(Player("Player B"s, "O", kIndexPlayerSecond));
+        players_.emplace_back(Player("Player A"s, "X", kIndexPlayerFirst_));
+        players_.emplace_back(Player("Player B"s, "O", kIndexPlayerSecond_));
     }
 
     void Greeting() const {
-        interface->Print("\rThe tic-tac-toe game has begun.\n"s);
+        interface_->Print("\rThe tic-tac-toe game has begun.\n"s);
     }
 
     int CheckWin(const Move& move , bool forecast = false) const {
@@ -438,7 +438,7 @@ private:
             return players_[1].GetSimbol();
         }
 
-        return kSimbolPlayerNone;
+        return kSimbolPlayerNone_;
     }
 
     Move GetMove() const {
@@ -448,18 +448,18 @@ private:
             string comand;
             do {
                 if(!comand.empty()) {
-                    interface->Print("\"" + comand + "\" is not valid move. Please enter valid move.\n");
+                    interface_->Print("\"" + comand + "\" is not valid move. Please enter valid move.\n");
                 }
-                interface->Print(GetCurrentPlayer().GetName() + ": "s);
-                interface->GetLine(comand);
+                interface_->Print(GetCurrentPlayer().GetName() + ": "s);
+                interface_->GetLine(comand);
                 move = Move(comand);
             } while (!IsValidMove(move));
         }  else {
-            interface->Print(GetCurrentPlayer().GetName() + ": "s);
+            interface_->Print(GetCurrentPlayer().GetName() + ": "s);
             do {
                 move = GetBotMove();
             } while (!IsValidMove(move));
-            interface->Print(move.ToString() + "\n");
+            interface_->Print(move.ToString() + "\n");
         }
 
         return move;
