@@ -1,6 +1,5 @@
 #include <vector>
 #include <string>
-#include <array>
 #include <cassert>
 #include <iostream>
 #include <random>
@@ -16,9 +15,17 @@ public:
         B
     };
 
-    Solution() : generator(chrono::system_clock::now().time_since_epoch().count()) {
+    Solution(int board_size = 3, int cells_to_win = 3) :           
+            kFieldSquireSize_(board_size),
+            kCellsToWin_(cells_to_win),
+            generator(chrono::system_clock::now().time_since_epoch().count())
+    {
+        assert(board_size > 0 && "Board size should be more than 0");
+        assert(cells_to_win > 0 && "Number of cells for win should be more than 0");
+        assert(cells_to_win <= board_size && "Number of cells for win can't be more than board size");
+        play_field_.resize(kFieldSquireSize_);
         for (auto& row : play_field_) {
-            row.fill(CellMark::EMPTY);
+            row.resize(kFieldSquireSize_, CellMark::EMPTY);
         }
     }
 
@@ -53,6 +60,7 @@ public:
                     cout << "Type your move (format X,Y)" << endl;
                     char comma;
                     cin >> move_x >> comma >> move_y;
+                    //TODO check values range
                     if (cin.fail()) {
                         cin.clear();
                         cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -87,7 +95,8 @@ public:
     }
 
 private:
-    static constexpr int kFieldSquireSize = 3;
+    const int kFieldSquireSize_;
+    const int kCellsToWin_;
     
     enum class CellMark {
         EMPTY,
@@ -115,7 +124,7 @@ private:
         WINNER_B
     };
 
-    array<array<CellMark, kFieldSquireSize>, kFieldSquireSize> play_field_;
+    vector<vector<CellMark>> play_field_;
     Player player_ = Player::A;
     mt19937 generator;
     uniform_int_distribution<int> distribution;
@@ -172,7 +181,7 @@ private:
     }
 
     int GetRandomToken() {
-        return uniform_int_distribution<int>(0, kFieldSquireSize - 1)(generator);
+        return uniform_int_distribution<int>(0, kFieldSquireSize_ - 1)(generator);
     }
 
     vector<int> RandomMove() {
@@ -194,6 +203,9 @@ private:
 
     GameCase MakeStep(const vector<int>& step_move) {    
         assert(step_move.size() == 2);
+        for (const auto& coord : step_move) {
+            assert(coord >= 0 && coord < kFieldSquireSize_);
+        }
         auto& field_cell = play_field_[step_move[0]][step_move[1]];
         assert(field_cell == CellMark::EMPTY);
 
@@ -220,9 +232,9 @@ private:
     }
 
     GameCase AnalyzeLine(const LineMarksQuantity& line_marks) {
-        if (line_marks.a_marks == kFieldSquireSize) { //full line with "A" marks
+        if (line_marks.a_marks == kCellsToWin_) { 
             return GameCase::WINNER_A;
-        } else if (line_marks.b_marks == kFieldSquireSize) { //full line with "B" marks
+        } else if (line_marks.b_marks == kCellsToWin_) {
             return GameCase::WINNER_B;
         } else {
             return GameCase::NOT_FINISHED;
@@ -276,7 +288,7 @@ private:
             }
         }
 
-        if (move_number_ < kFieldSquireSize * kFieldSquireSize) {
+        if (move_number_ < kFieldSquireSize_ * kFieldSquireSize_) {
             return GameCase::NOT_FINISHED;
         } else {
             return GameCase::DRAW;
@@ -306,19 +318,24 @@ void PlayWithPlayer(Solution::Player player) {
 
 void PlayGame() {
     while(1) {
+        cout << "Enter board size" << endl;
+        int board_size;
+        cin >> board_size;
+        cout << "Enter number of cells to win" << endl;
+        int cells_to_win;
+        cin >> cells_to_win;
+        Solution tic_tac(board_size, cells_to_win);
         cout << "Type mode: bots, player or exit" << endl;
         string mode_str;
         cin >> mode_str;
         transform(mode_str.begin(), mode_str.end(),mode_str.begin(), ::toupper);
         if (mode_str == "BOTS") {
-            Solution tic_tac;
             cout << "Game result: "s + tic_tac.tictactoe() << endl;
         } else if (mode_str == "PLAYER") {
             cout << "Select your side: A or B" << endl;
             string side;
             cin >> side;
             transform(side.begin(), side.end(),side.begin(), ::toupper);
-            Solution tic_tac;
             if (side == "A"s) {
                 PlayWithPlayer(Solution::Player::A);
             } else if (side == "B"s) {
@@ -362,6 +379,12 @@ void UnitTests() {
         Solution tic_tac;
         tic_tac.DisableStepPrinting();
         assert(tic_tac.tictactoe(moves) == "Pending"); 
+    }
+    {
+        vector<vector<int>> moves = {{0,0},{2,0},{1,1},{2,1},{2,2}, {3,0}, {5,5}};
+        Solution tic_tac(6, 4);
+        tic_tac.DisableStepPrinting();
+        assert(tic_tac.tictactoe(moves) == "A");
     }
     cout << __FUNCTION__ << " tests done"s << endl;
 }
