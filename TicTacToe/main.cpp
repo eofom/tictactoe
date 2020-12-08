@@ -15,6 +15,12 @@ public:
         B
     };
 
+    enum class GameType {
+        BOTS,
+        PLAYER_BOT,
+        PLAYERS
+    };
+
     Solution(int board_size = 3, int cells_to_win = 3) :           
             kFieldSquireSize_(board_size),
             kCellsToWin_(cells_to_win),
@@ -40,47 +46,19 @@ public:
         return DecodeGameCaseResult(game_result);
     }
 
-    string tictactoe() {
+    string tictactoe(GameType game_type, Player human_player = Player::A) {
         GameCase game_result = GameCase::NOT_FINISHED;
-        while(1) {
-            game_result = MakeStep(RandomMove());
-            if (game_result != GameCase::NOT_FINISHED) {
-                break;
-            }
-        }
-        return DecodeGameCaseResult(game_result);
-    }
-
-    string tictactoe(Player human_player) {
-        GameCase game_result = GameCase::NOT_FINISHED;
-        while(1) {
-            if (human_player == player_) {
-                int move_x, move_y;
-                while (1) {
-                    cout << "Type your move (format X,Y)" << endl;
-                    char comma;
-                    cin >> move_x >> comma >> move_y;
-                    //TODO check values range
-                    if (cin.fail()) {
-                        cin.clear();
-                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                        cout << "Incorrect format. Try again" << endl;
-                    }
-                    else if (play_field_[move_x][move_y] == CellMark::EMPTY) {
-                        break;
-                    } else {
-                        cin.clear();
-                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                        cout << "This cell isn't empty. Try again" << endl;
-                    }
-                }
-                game_result = MakeStep({move_x, move_y});
-            } else {
+        while (game_result == GameCase::NOT_FINISHED) {
+            if (game_type == GameType::BOTS) {
                 game_result = MakeStep(RandomMove());
-            }
-
-            if (game_result != GameCase::NOT_FINISHED) {
-                break;
+            } else if (game_type == GameType::PLAYER_BOT) {
+                if (human_player == player_) {
+                    game_result = MakeStep(HumanMove());
+                } else {
+                    game_result = MakeStep(RandomMove());
+                }
+            } else {
+                game_result = MakeStep(HumanMove());
             }
         }
         return DecodeGameCaseResult(game_result);
@@ -201,6 +179,33 @@ private:
         return {move_x, move_y};
     }
 
+    vector<int> HumanMove() {
+        int move_x, move_y;
+        while (1) {
+            cout << "Type your move (format X,Y)" << endl;
+            char comma;
+            cin >> move_x >> comma >> move_y;
+            if (cin.fail()) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Incorrect format. Try again" << endl;
+            } else if (move_x < 0 || move_x > kFieldSquireSize_ - 1
+                    || move_y < 0 || move_y > kFieldSquireSize_ - 1) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "This cell is out of board. Try again" << endl;
+            }
+            else if (play_field_[move_x][move_y] == CellMark::EMPTY) {
+                break;
+            } else {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "This cell isn't empty. Try again" << endl;
+            }
+        }
+        return {move_x, move_y};
+    }
+
     GameCase MakeStep(const vector<int>& step_move) {    
         assert(step_move.size() == 2);
         for (const auto& coord : step_move) {
@@ -306,45 +311,57 @@ string GetStringByPlayer(const Solution::Player player) {
     return ""s;
 }
 
-void PlayWithPlayer(Solution::Player player) {
-    Solution tic_tac;
-    string result = tic_tac.tictactoe(player);
-    cout << "Game result: "s << result << "."s;
-    if (result == GetStringByPlayer(player)) {
-        cout << " You win!"s;
+int InputValueInRange(const int min_value, const int max_value) {
+    int value;
+    while (1) {
+        cin >> value;
+        if (cin.fail() || value < min_value || value > max_value) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Incorrect value, range " << min_value << "..." << max_value << ". Try again" << endl;
+        } else {
+            break;
+        }
     }
-    cout << endl;
+    return value;
+}
+
+Solution::Player InputPlayer() {
+    cout << "Select your side: A or B" << endl;
+    while (1) {
+        string side;
+        cin >> side;
+        transform(side.begin(), side.end(),side.begin(), ::toupper);
+        if (side == "A"s) {
+            return Solution::Player::A;
+        } else if (side == "B"s) {
+            return Solution::Player::B;
+        } else {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Incorrect side. Try again" << endl;
+        }
+    }        
 }
 
 void PlayGame() {
+    cout << "Enter board size" << endl;
+    const int board_size = InputValueInRange(1, numeric_limits<int>::max());
+    cout << "Enter number of cells to win" << endl;
+    const int cells_to_win = InputValueInRange(1, board_size);
     while(1) {
-        cout << "Enter board size" << endl;
-        int board_size;
-        cin >> board_size;
-        cout << "Enter number of cells to win" << endl;
-        int cells_to_win;
-        cin >> cells_to_win;
         Solution tic_tac(board_size, cells_to_win);
-        cout << "Type mode: bots, player or exit" << endl;
+        cout << "Type mode: bots, player-bot, players or exit" << endl;
         string mode_str;
         cin >> mode_str;
         transform(mode_str.begin(), mode_str.end(),mode_str.begin(), ::toupper);
         if (mode_str == "BOTS") {
-            cout << "Game result: "s + tic_tac.tictactoe() << endl;
-        } else if (mode_str == "PLAYER") {
-            cout << "Select your side: A or B" << endl;
-            string side;
-            cin >> side;
-            transform(side.begin(), side.end(),side.begin(), ::toupper);
-            if (side == "A"s) {
-                PlayWithPlayer(Solution::Player::A);
-            } else if (side == "B"s) {
-                PlayWithPlayer(Solution::Player::B);
-            } else {
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "Incorrect side" << endl;
-            }
+            cout << "Game result: "s + tic_tac.tictactoe(Solution::GameType::BOTS) << endl;
+        } else if (mode_str == "PLAYERS") {
+            cout << "Game result: "s + tic_tac.tictactoe(Solution::GameType::PLAYERS) << endl;
+        } else if (mode_str == "PLAYER-BOT") {
+            const Solution::Player human_player = InputPlayer();
+            cout << "Game result: "s + tic_tac.tictactoe(Solution::GameType::PLAYER_BOT, human_player) << endl;
         } else if (mode_str == "EXIT") {
             break;
         } else {
