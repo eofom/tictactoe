@@ -10,6 +10,9 @@ using namespace std;
 
 class Solution {
 public:
+    //TODO Свяжи в коде эту A с литералами "A", которые встречаются ниже и с сущностью CellMark. 
+    // Видимо, понадобится структура PlayingSide или вроде того. 
+    // Для выражения идеи о том, что клетки бывают пустыми, можно использовать std::optional
     enum class Player {
         A,
         B
@@ -36,9 +39,12 @@ public:
     }
 
     string tictactoe(const vector<vector<int>>& moves) {
+        //TODO можно не создавать эту переменную, а возвращать результат как только он получен
         GameCase game_result = GameCase::NOT_FINISHED;
         for (const auto& single_move : moves) {
-            game_result = MakeStep(single_move);
+            assert(single_move.size() == 2);
+            Move move{single_move[0], single_move[1]};
+            game_result = MakeStep(move);
             if (game_result != GameCase::NOT_FINISHED) {
                 break;
             }
@@ -76,20 +82,27 @@ private:
     const int kFieldSquireSize_;
     const int kCellsToWin_;
     
+    struct Move {
+        int x = 0;
+        int y = 0;
+    };
+
     enum class CellMark {
         EMPTY,
         A,
         B
     };
 
+    //TODO Хватает считать только одни marks, те, что в последнем ходе. В итоге, когда ты 
+    // еще и запакуешь обработку разных линий в один метод, эта структура потеряет смысл
     struct LineMarksQuantity {
         int a_marks;
         int b_marks;
         LineMarksQuantity operator+=(const CellMark mark) {
             if (mark == CellMark::A) {
-                ++this->a_marks;
+                ++a_marks;
             } else if (mark == CellMark::B) {
-                ++this->b_marks;
+                ++b_marks;
             }
             return *this;
         }
@@ -162,40 +175,41 @@ private:
         return uniform_int_distribution<int>(0, kFieldSquireSize_ - 1)(generator);
     }
 
-    vector<int> RandomMove() {
+    Move RandomMove() {
         //at least 1 empty cell required
         assert(CheckFinish() == GameCase::NOT_FINISHED);
-        
-        int move_x = 0;
-        int move_y = 0;
-        while(1) {
+        Move move{};
+        while(true) {
+            //TODO попробуй реализовать выбор поля за одно разыгрывание, без цикла
             //This is very simple bot. It doesn't analyze strategy and tactic. Only makes random move
-            move_x = GetRandomToken();
-            move_y = GetRandomToken();
-            if (play_field_[move_x][move_y] == CellMark::EMPTY) {
+            move.x = GetRandomToken();
+            move.y = GetRandomToken();
+            if (play_field_[move.x][move.y] == CellMark::EMPTY) {
                 break;
             }
         }
-        return {move_x, move_y};
+        return move;
     }
 
-    vector<int> HumanMove() {
-        int move_x, move_y;
-        while (1) {
+    Move HumanMove() {
+        //at least 1 empty cell required
+        assert(CheckFinish() == GameCase::NOT_FINISHED);
+        Move move{};
+        while (true) {
             cout << "Type your move (format X,Y)" << endl;
             char comma;
-            cin >> move_x >> comma >> move_y;
+            cin >> move.x >> comma >> move.y;
             if (cin.fail()) {
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "Incorrect format. Try again" << endl;
-            } else if (move_x < 0 || move_x > kFieldSquireSize_ - 1
-                    || move_y < 0 || move_y > kFieldSquireSize_ - 1) {
+            } else if (move.x < 0 || move.x > kFieldSquireSize_ - 1
+                    || move.y < 0 || move.y > kFieldSquireSize_ - 1) {
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "This cell is out of board. Try again" << endl;
             }
-            else if (play_field_[move_x][move_y] == CellMark::EMPTY) {
+            else if (play_field_[move.x][move.y] == CellMark::EMPTY) {
                 break;
             } else {
                 cin.clear();
@@ -203,15 +217,13 @@ private:
                 cout << "This cell isn't empty. Try again" << endl;
             }
         }
-        return {move_x, move_y};
+        return move;
     }
 
-    GameCase MakeStep(const vector<int>& step_move) {    
-        assert(step_move.size() == 2);
-        for (const auto& coord : step_move) {
-            assert(coord >= 0 && coord < kFieldSquireSize_);
-        }
-        auto& field_cell = play_field_[step_move[0]][step_move[1]];
+    GameCase MakeStep(const Move& move) {    
+        assert(move.x >= 0 && move.x < kFieldSquireSize_);
+        assert(move.y >= 0 && move.y < kFieldSquireSize_);
+        auto& field_cell = play_field_[move.x][move.y];
         assert(field_cell == CellMark::EMPTY);
 
         field_cell = MarkCell(player_);
@@ -247,6 +259,9 @@ private:
     }
 
     GameCase CheckFinish() {
+        //TODO Тут много дублированного кода. Запакуй эти три проверки в один метод, принимающий начало линии и шаг.
+        // А здесь только вызывай их, проходясь по возможным положениям начала и возможным шагам.
+        //TODO Проверяй только линии, содержащие последний ход
         //Check horizontal lines
         for (const auto& raw : play_field_) {
             LineMarksQuantity line_marks{};
@@ -313,7 +328,7 @@ string GetStringByPlayer(const Solution::Player player) {
 
 int InputValueInRange(const int min_value, const int max_value) {
     int value;
-    while (1) {
+    while (true) {
         cin >> value;
         if (cin.fail() || value < min_value || value > max_value) {
             cin.clear();
@@ -328,7 +343,7 @@ int InputValueInRange(const int min_value, const int max_value) {
 
 Solution::Player InputPlayer() {
     cout << "Select your side: A or B" << endl;
-    while (1) {
+    while (true) {
         string side;
         cin >> side;
         transform(side.begin(), side.end(),side.begin(), ::toupper);
@@ -349,7 +364,7 @@ void PlayGame() {
     const int board_size = InputValueInRange(1, numeric_limits<int>::max());
     cout << "Enter number of cells to win" << endl;
     const int cells_to_win = InputValueInRange(1, board_size);
-    while(1) {
+    while(true) {
         Solution tic_tac(board_size, cells_to_win);
         cout << "Type mode: bots, player-bot, players or exit" << endl;
         string mode_str;
