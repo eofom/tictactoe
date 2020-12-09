@@ -1,4 +1,7 @@
 # tictactoe
+
+https://leetcode.com/problems/find-winner-on-a-tic-tac-toe-game/
+
 Крестики-нолики N*N c целью M:
 - Игра происходит на поле N*N, изначально поле пустое
 - Игроки ходят по очереди, помещая символы в пустые клетки
