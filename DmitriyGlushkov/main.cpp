@@ -15,12 +15,13 @@ public:
         int size;
         Node* left;
         Node* right;
-        Node(int key): key(key), left(0), right(0), size(1) {
+
+        Node(int key): key(key), left(nullptr), right(nullptr), size(1) {
 
         }
     };
 
-    explicit RandomizedBinarySearchTree(int seed): root_(0), generator_(std::mt19937(seed)) {
+    explicit RandomizedBinarySearchTree(int seed): root_(nullptr), generator_(seed) {
 
     }
 
@@ -50,11 +51,11 @@ public:
     }
 
 private:
-    Node* root_ = 0;
+    Node* root_ = nullptr;
     std::mt19937 generator_;
 
     Node* Find(Node* p, int key) const {
-        if (!p) return 0;
+        if (!p) return nullptr;
         if (key == p->key) {
             return p;
         }
@@ -154,7 +155,7 @@ private:
         if (p != root_) {
             delete p;
         } else {
-            root_ =0;
+            root_ = nullptr;
         }
     }
 };
@@ -167,49 +168,82 @@ void PrintTree(RandomizedBinarySearchTree::Node* p, bool is_root = true) {
     if (is_root) cout << endl;
 }
 
-class Player {
+class IInterface {
 public:
-    enum class Type {
-        USER,
-        BOT,
-        SMART_BOT
-    };
+    virtual void SetVisible(bool) = 0;
+    virtual void PrintGrid(const vector<vector<string>>&) const = 0;
+    virtual void Print(const string&) const = 0;
+    virtual void GetLine(string&) const = 0;
 
-    explicit Player(const string& name, const string& simbol, int index)
-        : name_(name),
-        simbol_(simbol),
-        index_(index) {
+    virtual ~IInterface() {};
+};
+
+class ConsolInterface: public IInterface {
+public:
+    void SetVisible(bool visible) override {
+        visible_ = visible;
     }
 
-    string GetName() const {
-        return name_;
+    void GetLine(string& comand) const override {
+        getline(cin, comand);
     }
 
-    string GetSimbol() const {
-        return simbol_;
+    void PrintGrid(const vector<vector<string>>& grid) const override {
+        Print("\n"s);
+        for (int i = 0; i < grid.size(); ++ i) {
+            PrintRowAndVerticalMarks(grid, i);
+            (i + 1 < grid.size()) ? PrintBorder(grid) : PrintHorizontalMarks(grid);
+        }
     }
 
-    int GetIndex() const {
-        return index_;
+    void Print(const string& str) const override {
+        if (visible_) {
+            cout << str;
+        }
     }
 
 private:
-    string name_;
-    string simbol_;
-    int index_;
+    void PrintRowAndVerticalMarks(vector<vector<string>> grid, int row_index) const {
+        Print(" "s);
+        for (int j = 0; j < grid.size(); ++ j) {
+            if (j != 0) {
+                Print(" | "s);
+            }
+            Print(grid[row_index][j]);
+        }
+        Print(" "s + to_string(row_index + 1) + "\n"s);
+    }
+
+    void PrintBorder(vector<vector<string>> grid) const {
+        Print(" "s);
+        for (unsigned int j = 0; j + 1 < grid.size() * 2; ++ j) {
+            Print(((j & 1) == 1 ?  "-"s : " + "s));
+        }
+        Print("\n"s);
+    }
+
+    void PrintHorizontalMarks(vector<vector<string>> grid) const {
+        Print(" "s);
+        for (int j = 0; j < grid.size(); ++ j) {
+            Print(static_cast<char>('a' + j)  + "   "s);
+        }
+        Print("\n"s);
+    }
+
+    bool visible_ = true;
 };
 
-ostream& operator<<(ostream& out, const Player::Type& player_type) {
-    switch (player_type) {
-        case Player::Type::USER:
-            out << "USER"s;
-        case Player::Type::BOT:
-            out << "BOT"s;
-        case Player::Type::SMART_BOT:
-            out << "SMART_BOT"s;
-    }
-    return out;
-}
+enum class PlayerType {
+    USER,
+    BOT,
+    SMART_BOT
+};
+
+struct Player {
+    const string name_;
+    const string symbol_;
+    const int index_;
+};
 
 struct Move {
     int h_index;
@@ -240,110 +274,52 @@ ostream& operator<<(ostream& out, const Move& move) {
     return out << "(" << move.h_index << ", " << move.v_index << ")";
 }
 
-class IInterface {
-public:
-    virtual void SetVisible(bool) = 0;
-    virtual void PrintGrid(const vector<vector<string>>&) const = 0;
-    virtual void Print(const string&) const = 0;
-    virtual void GetLine(string&) const = 0;
-
-    virtual ~IInterface() {};
-};
-
-class ConsolInterface: public IInterface {
-public:
-    void SetVisible(bool visible) {
-        visible_ = visible;
-    }
-
-    void GetLine(string& comand) const {
-        getline(cin, comand);
-    }
-
-    void PrintGrid(const vector<vector<string>>& grid) const {
-        Print("\n"s);
-        for (int i = 0; i < grid.size(); ++ i) {
-            PrintRowAndVerticalMarks(grid, i);
-            (i + 1 < grid.size()) ? PrintBorder(grid) : PrintHorizontalMarks(grid);
-        }
-    }
-
-    void Print(const string& str) const {
-        if (visible_) {
-            cout << str;
-        }
-    }
-
-private:
-    bool visible_ = true;
-
-    void PrintRowAndVerticalMarks(vector<vector<string>> grid, int row_index) const {
-        Print(" "s);
-        for (int j = 0; j < grid.size(); ++ j) {
-            if (j != 0) {
-                Print(" | "s);
-            }
-            Print(grid[row_index][j]);
-        }
-        Print(" "s + to_string(row_index + 1) + "\n"s);
-    }
-
-    void PrintBorder(vector<vector<string>> grid) const {
-        Print(" "s);
-        for (int j = 0; j + 1 < grid.size() * 2; ++ j) {
-            Print((j % 2 == 0 ?  "-"s : " + "s));
-        }
-        Print("\n"s);
-    }
-
-    void PrintHorizontalMarks(vector<vector<string>> grid) const {
-        Print(" "s);
-        for (int j = 0; j < grid.size(); ++ j) {
-            Print(static_cast<char>('a' + j)  + "   "s);
-        }
-        Print("\n"s);
-    }
-};
-
 class Tictactoe {
 public:
-    Tictactoe(Player::Type player_type_a = Player::Type::BOT,
-              Player::Type player_type_b = Player::Type::BOT,
+    Tictactoe(PlayerType player_type_a = PlayerType::BOT,
+              PlayerType player_type_b = PlayerType::BOT,
               int grid_size = 3, int target = 0)
             : grid_size_(grid_size),
               target_(target ? target : grid_size),
               players_type_({player_type_a, player_type_b}),
               interface_(new ConsolInterface()),
-              index_valid_moves_(RandomizedBinarySearchTree(chrono::system_clock::now().time_since_epoch().count())) {
-        interface_->SetVisible(player_type_a == Player::Type::USER || player_type_b == Player::Type::USER);
+              valid_moves_indexes_(RandomizedBinarySearchTree(chrono::system_clock::now().time_since_epoch().count())) {
+        interface_->SetVisible(player_type_a == PlayerType::USER || player_type_b == PlayerType::USER);
         assert(kIndexPlayerNone_ == 0);
         assert(kIndexPlayerFirst_ + kIndexPlayerSecond_ == kIndexPlayerNone_);
         assert(kIndexPlayerFirst_ * kIndexPlayerSecond_ != kIndexPlayerNone_);
+        PlayersInit();
     }
 
     string Play() {
         PlayInit();
         Greeting();
         for (int i = 0; i < grid_size_ * grid_size_; ++i) {
-            interface_->PrintGrid(grid_wiev_);
-            if (CheckWin(DoMove(GetMove()))){
-                interface_->PrintGrid(grid_wiev_);
-                return GetPrevPlayer().GetName() + " is win!"s;
+            interface_->PrintGrid(grid_view_);
+            Move move = GetMove();
+            DoMove(move);
+            bool is_win = CheckWin(move);
+            if (is_win){
+                interface_->PrintGrid(grid_view_);
+                return GetPrevPlayer().name_ + " is win!"s;
             }
         }
-        interface_->PrintGrid(grid_wiev_);
+        interface_->PrintGrid(grid_view_);
         return "Draw"s;
     }
 
-    string Play(vector<vector<int>> moves)  {
+    string MovesAnalysis(vector<vector<int>> moves)  {
         PlayInit();
         for (int i = 0; i < moves.size(); ++i) {
-            Move move = {moves[i][1], moves[i][0]};
-            if (!IsValidMove(move)) {
+            Move move{moves[i][1], moves[i][0]};
+            bool is_valid_move = IsValidMove(move);
+            if (!is_valid_move) {
                 return "Not valid мove"s;
             }
-            if (CheckWin(DoMove(move))){
-                return moves.size() % 2 ? "A"s : "B"s;
+            DoMove(move);
+            bool is_win = CheckWin(move);
+            if (is_win){
+                return (moves.size() & 1) == 1 ? "A"s : "B"s;
             }
         }
         return moves.size() < grid_size_*grid_size_ ? "Pending"s : "Draw"s;
@@ -354,47 +330,32 @@ public:
     }
 
 private:
-    int grid_size_ = 3;
-    int moves_count_ = 0;
-    int target_ = grid_size_;
-    vector<Player> players_;
-    vector<vector<int>> grid_;
-    vector<vector<string>> grid_wiev_;
-    vector<Player::Type> players_type_;
-    RandomizedBinarySearchTree index_valid_moves_;
-    shared_ptr<IInterface> interface_;
-
     inline static const int kIndexPlayerFirst_ = -1;
     inline static const int kIndexPlayerSecond_ = 1;
     inline static const int kIndexPlayerNone_ = 0;
-    inline static const string kSimbolPlayerNone_ = " "s;
+    inline static const string kSymbolPlayerNone_ = " "s;
 
     void PlayInit() {
         moves_count_ = 0;
         SetGrid();
         SetValidMovs();
-        PlaerInit();
-    }
+     }
 
     void SetGrid() {
         grid_ = vector<vector<int>>(grid_size_, vector<int>(grid_size_, kIndexPlayerNone_));
-        grid_wiev_ = vector<vector<string>>(grid_size_, vector<string>(grid_size_, kSimbolPlayerNone_));
+        grid_view_ = vector<vector<string>>(grid_size_, vector<string>(grid_size_, kSymbolPlayerNone_));
     }
 
     void SetValidMovs() {
-        index_valid_moves_.Clear();
-        for (int i = 0; i < grid_size_; ++i) {
-            for (int j = 0; j < grid_size_; ++j) {
-                if (grid_[i][j] == kIndexPlayerNone_) {
-                    index_valid_moves_.Insert(grid_size_ * i + j);
-                }
-            }
+        valid_moves_indexes_.Clear();
+        for (int i = 0; i < grid_size_ * grid_size_; ++i) {
+            valid_moves_indexes_.Insert(i);
         }
     }
 
-    void PlaerInit() {
-        players_.emplace_back(Player("Player A"s, "X", kIndexPlayerFirst_));
-        players_.emplace_back(Player("Player B"s, "O", kIndexPlayerSecond_));
+    void PlayersInit() {
+        players_.emplace_back(Player{"Player A"s, "X"s, kIndexPlayerFirst_});
+        players_.emplace_back(Player{"Player B"s, "O"s, kIndexPlayerSecond_});
     }
 
     void Greeting() const {
@@ -412,7 +373,7 @@ private:
         }
 
         for (int sum: sums) {
-            if (abs(sum) == abs((target_ - forecast) * GetCurrentPlayer().GetIndex())) {
+            if (abs(sum) == abs((target_ - forecast) * GetCurrentPlayer().index_)) {
                 return sum;
             }
         }
@@ -421,42 +382,42 @@ private:
     }
 
     Player GetCurrentPlayer() const {
-        return players_[moves_count_ % 2];
+        return players_[(moves_count_ & 1) == 1];
     }
 
     Player GetPrevPlayer() {
-        return players_[!(moves_count_ % 2)];
+        return players_[(moves_count_ & 1) == 0];
     }
 
-    Player::Type GetCurrentPlayerType() const  {
-        return players_type_[moves_count_ % 2];
+    PlayerType GetCurrentPlayerType() const  {
+        return players_type_[(moves_count_ & 1) == 1];
     }
 
-    string ConvertPlayerIndexToSimbol(int index) const {
-        if (index ==  players_[0].GetIndex()) {
-            return players_[0].GetSimbol();
-        } else if (index ==  players_[1].GetIndex()) {
-            return players_[1].GetSimbol();
+    string ConvertPlayerIndexToSymbol(int index) const {
+        if (index ==  players_[0].index_) {
+            return players_[0].symbol_;
+        } else if (index ==  players_[1].index_) {
+            return players_[1].symbol_;
         }
 
-        return kSimbolPlayerNone_;
+        return kSymbolPlayerNone_;
     }
 
     Move GetMove() const {
         Move move(-1, -1);
 
-        if (GetCurrentPlayerType() == Player::Type::USER) {
+        if (GetCurrentPlayerType() == PlayerType::USER) {
             string comand;
             do {
                 if(!comand.empty()) {
                     interface_->Print("\"" + comand + "\" is not valid move. Please enter valid move.\n");
                 }
-                interface_->Print(GetCurrentPlayer().GetName() + ": "s);
+                interface_->Print(GetCurrentPlayer().name_ + ": "s);
                 interface_->GetLine(comand);
                 move = Move(comand);
             } while (!IsValidMove(move));
         }  else {
-            interface_->Print(GetCurrentPlayer().GetName() + ": "s);
+            interface_->Print(GetCurrentPlayer().name_ + ": "s);
             do {
                 move = GetBotMove();
             } while (!IsValidMove(move));
@@ -466,16 +427,15 @@ private:
         return move;
     }
 
-    const Move& DoMove(const Move& move) {
-        grid_[move.h_index][move.v_index] = GetCurrentPlayer().GetIndex();
-        grid_wiev_[move.h_index][move.v_index] = ConvertPlayerIndexToSimbol(grid_[move.h_index][move.v_index]);
-        index_valid_moves_.Remove(grid_size_ * move.h_index + move.v_index);
+    void DoMove(const Move& move) {
+        grid_[move.h_index][move.v_index] = GetCurrentPlayer().index_;
+        grid_view_[move.h_index][move.v_index] = ConvertPlayerIndexToSymbol(grid_[move.h_index][move.v_index]);
+        valid_moves_indexes_.Remove(grid_size_ * move.h_index + move.v_index);
         ++moves_count_;
-        return move;
     }
 
     bool IsValidMove(const Move& move) const {
-        return  move.h_index >= 0 && move.h_index < grid_size_ && move.v_index >= 0 && move.v_index < grid_size_ && index_valid_moves_.Find(grid_size_ * move.h_index + move.v_index);
+        return  move.h_index >= 0 && move.h_index < grid_size_ && move.v_index >= 0 && move.v_index < grid_size_ && valid_moves_indexes_.Find(grid_size_ * move.h_index + move.v_index);
     }
 
     Move IndexToMove(int move_index) const {
@@ -483,11 +443,11 @@ private:
     }
 
     Move GetBotMove() const {
-        if (GetCurrentPlayerType() == Player::Type::SMART_BOT) {
-            return GetSmartBotMove(index_valid_moves_.GetRoot());
+        if (GetCurrentPlayerType() == PlayerType::SMART_BOT) {
+            return GetSmartBotMove(valid_moves_indexes_.GetRoot());
         }
 
-        return IndexToMove(index_valid_moves_.GetRoot()->key);
+        return IndexToMove(valid_moves_indexes_.GetRoot()->key);
     }
 
     Move GetSmartBotMove(RandomizedBinarySearchTree::Node* root) const {
@@ -498,7 +458,7 @@ private:
     RandomizedBinarySearchTree::Node* SmartMove(RandomizedBinarySearchTree::Node* p) const {
         RandomizedBinarySearchTree::Node* tmp_result = 0;
 
-        int chance_to_win_for_current_player = CheckWin(IndexToMove(p->key), true) / GetCurrentPlayer().GetIndex();
+        int chance_to_win_for_current_player = CheckWin(IndexToMove(p->key), true) / GetCurrentPlayer().index_;
         if (chance_to_win_for_current_player > 0) {
             return p;
         } else if (chance_to_win_for_current_player < 0) {
@@ -517,18 +477,28 @@ private:
 
         return tmp_result;
     }
+
+    const int grid_size_ = 3;
+    unsigned int moves_count_ = 0;
+    int target_ = grid_size_;
+    vector<Player> players_;
+    vector<vector<int>> grid_;
+    vector<vector<string>> grid_view_;
+    vector<PlayerType> players_type_;
+    RandomizedBinarySearchTree valid_moves_indexes_;
+    shared_ptr<IInterface> interface_;
 };
 
 void Tests() {
     Tictactoe game;
-    assert(game.Play({{0, 0} ,{2, 0}, {0, 1}, {2, 1}, {0, 2}}) == "A"s);
-    assert(game.Play({{1, 2} ,{2, 0}, {0, 1}, {1, 0}, {2, 2} , {0, 0}}) == "B"s);
-    assert(game.Play({{0, 0}, {1, 1}, {0, 1}, {0, 2}, {1, 0}, {2, 0}}) == "B"s);
-    assert(game.Play({{0, 0} ,{2, 0}, {1, 1}, {2, 1}, {2, 2}}) == "A"s);
-    assert(game.Play({{0, 0}, {1, 1}, {0, 1}, {0, 2}, {1, 0}, {2, 0}}) == "B"s);
-    assert(game.Play({{0, 0}, {1, 1}, {2, 0}, {1, 0}, {1, 2}, {2, 1}, {0, 1}, {0, 2}, {2, 2}}) == "Draw"s);
-    assert(game.Play({{0, 0}, {1, 1}}) == "Pending"s);
-    assert(game.Play({{0, 0}, {1, 1}, {1, 1}}) == "Not valid мove"s);
+    assert(game.MovesAnalysis({{0, 0}, {2, 0}, {0, 1}, {2, 1}, {0, 2}}) == "A"s);
+    assert(game.MovesAnalysis({{1, 2}, {2, 0}, {0, 1}, {1, 0}, {2, 2}, {0, 0}}) == "B"s);
+    assert(game.MovesAnalysis({{0, 0}, {1, 1}, {0, 1}, {0, 2}, {1, 0}, {2, 0}}) == "B"s);
+    assert(game.MovesAnalysis({{0, 0}, {2, 0}, {1, 1}, {2, 1}, {2, 2}}) == "A"s);
+    assert(game.MovesAnalysis({{0, 0}, {1, 1}, {0, 1}, {0, 2}, {1, 0}, {2, 0}}) == "B"s);
+    assert(game.MovesAnalysis({{0, 0}, {1, 1}, {2, 0}, {1, 0}, {1, 2}, {2, 1}, {0, 1}, {0, 2}, {2, 2}}) == "Draw"s);
+    assert(game.MovesAnalysis({{0, 0}, {1, 1}}) == "Pending"s);
+    assert(game.MovesAnalysis({{0, 0}, {1, 1}, {1, 1}}) == "Not valid мove"s);
 
     cout << "Tests Ok" << endl;
 }
@@ -536,10 +506,11 @@ void Tests() {
 int main() {
     Tests();
 
-    Tictactoe game(Player::Type::USER, Player::Type::BOT);
+    Tictactoe game(PlayerType::USER, PlayerType::BOT);
 
     while (true) {
-        cout << game.Play() << endl;
+        auto result = game.Play();
+        cout << result << endl;
         cout << endl << "Play again? y/n: "s;
         string answer;
         getline(cin, answer);
