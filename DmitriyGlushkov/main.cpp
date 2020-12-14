@@ -16,12 +16,18 @@ public:
         Node* left;
         Node* right;
 
-        explicit Node(int key): key(key), left(nullptr), right(nullptr), size(1) {
+        explicit Node(int key)
+            : key(key),
+            left(nullptr),
+            right(nullptr),
+            size(1) {
 
         }
     };
 
-    explicit RandomizedBinarySearchTree(int seed): root_(nullptr), generator_(seed) {
+    explicit RandomizedBinarySearchTree(int seed)
+        : root_(nullptr),
+        generator_(seed) {
 
     }
 
