@@ -222,8 +222,8 @@ private:
 
     void PrintBorder(const vector<vector<string>>& grid) const {
         Print(" "s);
-        for (unsigned int j = 0u; j + 1u < grid.size() * 2u; ++j) {
-            Print(((j & 1u) == 1u ?  "-"s : " + "s));
+        for (uint8_t j = 0u; j + 1u < grid.size() * 2u; ++j) {
+            Print((j & 1u ? " + "s : "-"s));
         }
         Print("\n"s);
     }
@@ -325,7 +325,7 @@ public:
             DoMove(move);
             bool is_win = CheckWin(move);
             if (is_win){
-                return (moves.size() & 1u) == 1u ? "A"s : "B"s;
+                return moves.size() & 1u ? "A"s : "B"s;
             }
         }
         return moves.size() < grid_size_*grid_size_ ? "Pending"s : "Draw"s;
@@ -391,15 +391,15 @@ private:
     }
 
     [[nodiscard]] Player GetCurrentPlayer() const {
-        return players_[(moves_count_ & 1u) == 1u];
+        return players_[moves_count_ & 1u];
     }
 
     Player GetPrevPlayer() {
-        return players_[(moves_count_ & 1u) == 0u];
+        return players_[!(moves_count_ & 1u)];
     }
 
     [[nodiscard]] PlayerType GetCurrentPlayerType() const  {
-        return players_type_[(moves_count_ & 1u) == 1u];
+        return players_type_[moves_count_ & 1u];
     }
 
     [[nodiscard]] string ConvertPlayerIndexToSymbol(int index) const {
@@ -488,7 +488,7 @@ private:
     }
 
     const int grid_size_ = 3;
-    unsigned int moves_count_ = 0;
+    uint8_t moves_count_ = 0u;
     int target_ = grid_size_;
     vector<Player> players_;
     vector<vector<int>> grid_;
