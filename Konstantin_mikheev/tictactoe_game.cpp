@@ -13,9 +13,9 @@ const std::vector<std::pair<int, int>> kCorners = {
 
 enum GameMode { kBotVsHuman, kHumanVsBot, kBotVsBot };
 
-enum class GameState { kWinA, kWinB, kPending, kDraw };
+enum class GameState { kWinA, kWinB, kPending, kDraw, kAborted };
 
-class Solution {
+class PlayGroundManager {
  public:
   void ClearGrid() {
     for (std::string &row : grid) {
@@ -23,7 +23,7 @@ class Solution {
     }
   }
 
-  GameState tictactoe(std::vector<std::vector<int>> &moves) {
+  GameState ParseMove(std::vector<std::vector<int>> &moves) {
     // Filling playgrond with moves done
     for (int index = 0; index < moves.size(); ++index) {
       char sign;
@@ -103,19 +103,22 @@ class Solution {
   }
 };
 
-class TicTacToeBot {
+class GamingBot {
  public:
-  TicTacToeBot() { std::cout << "********** Tic Tac Toe game **********\n\n"; }
+  GamingBot() { std::cout << "********** Tic Tac Toe game **********\n\n"; }
 
-  void PlayGame() {
+  bool PlayGame() {
     GameInit();
     if (game_mode_ == GameMode::kBotVsBot) {
       Test();
-      return;
+      return true;
     }
     GameState game_state;
     while (true) {
       game_state = GetPlayerMove();
+      if (game_state == GameState::kAborted) {
+        return false;
+      }
       if (game_state != GameState::kPending) {
         break;
       }
@@ -125,23 +128,24 @@ class TicTacToeBot {
       }
     }
     PrintGameResult(game_state);
+    return true;
   }
 
  private:
   std::string player_1_name_;
   std::string player_2_name_;
   std::vector<std::vector<int>> moves_done_;
-  Solution round_;
+  PlayGroundManager play_ground_;
   GameMode game_mode_ = kBotVsHuman;
   bool (*CheckForEvenOddMovesPtr)(int) = nullptr;
 
-  bool DigitIsCorrect(char ch) { return ch >= '0' && ch <= '2'; }
+  bool MoveCoordinateIsValid(char ch) { return ch >= '0' && ch <= '2'; }
 
   bool InputIsCorrect(std::string &raw_input) {
     if (raw_input.empty() || raw_input.length() != 2) {
       return false;
     }
-    return (DigitIsCorrect(raw_input[0]) && DigitIsCorrect(raw_input[1]));
+    return (MoveCoordinateIsValid(raw_input[0]) && MoveCoordinateIsValid(raw_input[1]));
   }
 
   void PrintGameResult(GameState game_state) {
@@ -173,7 +177,7 @@ class TicTacToeBot {
   }
 
   void GameInit() {
-    round_.ClearGrid();
+    play_ground_.ClearGrid();
     moves_done_.clear();
     std::cout << "\nSelect the game mode:\n"
               << "    1: Bot vs player\n"
@@ -208,7 +212,7 @@ class TicTacToeBot {
         player_1_name_ = "Player";
         player_2_name_ = "Bot";
         CheckForEvenOddMovesPtr = CheckForOddMoves;
-        round_.tictactoe(moves_done_);
+        play_ground_.ParseMove(moves_done_);
         break;
       case kBotVsBot:
         std::cout << "\nBot 1 plays with \"X\" sign, Bot 2 with \"O\" sign\n\n";
@@ -229,7 +233,7 @@ class TicTacToeBot {
                    "\"stop\" to exit: ";
       std::getline(std::cin, input);
       if (input == "stop") {
-        throw -1;
+        return GameState::kAborted;
       }
       if (InputIsCorrect(input)) {
         row = std::stoi(input.substr(0, 1));
@@ -246,7 +250,7 @@ class TicTacToeBot {
       std::cout << "Invalid move! Cell (" << row << ", " << column
                 << ") is already occupied. Enter again!\n";
     } while (true);
-    return round_.tictactoe(moves_done_);
+    return play_ground_.ParseMove(moves_done_);
   }
 
   bool MoveIsCorrect(int row, int column) {
@@ -306,13 +310,14 @@ class TicTacToeBot {
     AddMove(bot_row, bot_column);
     std::cout << bot_name << " move: (" << bot_row << ", " << bot_column << ")"
               << '\n';
-    return round_.tictactoe(moves_done_);
+    return play_ground_.ParseMove(moves_done_);
   }
 
   // Checking if diagonally opposite cell is empty
   std::vector<int> CheckDiagonal(
       const std::vector<std::set<int>> &player_1_table,
-      const std::vector<std::set<int>> &player_2_table, int corner) {
+      const std::vector<std::set<int>> &player_2_table, int corner)
+  {
     int opposite_corner = corner + 2;
     if (opposite_corner > 3) {
       opposite_corner -= 4;
@@ -416,6 +421,10 @@ class TicTacToeBot {
         player_1_table.push_back(player_1_row);
         player_2_table.push_back(player_2_row);
       }
+      if (player_1_seized_center && player_2_seized_center) {
+        throw std::logic_error(
+            "Error of distributing players's moves to tables");
+      }
 
       std::vector<int> computed_move;
       // Checking if win is possible
@@ -437,30 +446,33 @@ class TicTacToeBot {
       computed_move = SearchForCellToSeize(player_2_table, player_1_table,
                                            player_2_seized_center);
       return computed_move;
-    } catch (...) {
-      std::cout << "Something went wrong, ComputeMove function failed.\n";
+    } catch (std::logic_error& e){
+      std::cout << '\n' << e.what() << '\n';
+      exit;
+    }
+    catch (...) {
+      std::cout << "Unknown error, ComputeMove function failed.\n";
       exit;
     }
   }
 };
 
 int main() {
-  TicTacToeBot bot;
-  try {
-    while (true) {
-      bot.PlayGame();
-      std::cout << "\nOne more game? (y/n): ";
-      std::string answer;
-      std::getline(std::cin, answer);
-      if (answer == "n" || answer == "N" || answer == "stop") {
-        break;
-      }
-    }
+  GamingBot bot;
 
-  } catch (int) {
-    // Game has been discontinued by player
-  }
+  while (true) {
+    if (!bot.PlayGame()) {
+      break;
+    }    
+    std::cout << "\nOne more game? (y/n): ";
+    std::string answer;
+    std::getline(std::cin, answer);
+    if (answer == "n" || answer == "N" || answer == "stop") {
+      break;
+    }
+  }  
   std::cout << "\nGame over!\n\n";
+  system("pause");
 
   return EXIT_SUCCESS;
 }
